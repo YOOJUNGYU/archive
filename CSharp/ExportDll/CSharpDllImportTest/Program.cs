@@ -5,7 +5,7 @@ namespace ImportDllTest
 {
     class Program
     {
-        [DllImport("CSharpDll.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        [DllImport("CSharpDll.dll", CharSet = CharSet.Ansi, SetLastError = true)]
         private static extern string StringTest(string str);
 
         [DllImport("CSharpDll.dll", CharSet = CharSet.Auto, SetLastError = true)]
