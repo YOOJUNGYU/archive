@@ -12,8 +12,8 @@ namespace ExportDll
     /// c# 으로 만든 dll 을 Export 시켜 다른 곳에서 사용할 수 있도록 해주는 실행파일입니다.
     /// export 시키고자 하는 dll 을 ExportDll.exe 파일이 빌드되는 위치에 넣고,
     /// 속성 > 디버그 > 명령줄인수에 dll파일의 경로(FullPath)를 넣어주고 exe 를 실행시킵니다
-    /// http://thermidor.tistory.com/1397
-    /// https://www.codeproject.com/Articles/16310/How-to-Automate-Exporting-NET-Function-to-Unmanage
+    /// 참고 URL : http://thermidor.tistory.com/1397
+    /// 참고 URL : https://www.codeproject.com/Articles/16310/How-to-Automate-Exporting-NET-Function-to-Unmanage
     /// </summary>
     internal enum ParserState
     {
