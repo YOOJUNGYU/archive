@@ -8,7 +8,7 @@ using System.Runtime.CompilerServices;
 [AttributeUsage(AttributeTargets.Method)]
 public class ExportDllAttribute : Attribute
 {
-    public ExportDllAttribute(string exportName) : this(exportName, System.Runtime.InteropServices.CallingConvention.StdCall) { }
+    public ExportDllAttribute(string exportName) : this(exportName, CallingConvention.StdCall) { }
     public ExportDllAttribute() : this(null) { }
-    public ExportDllAttribute(string exportName, System.Runtime.InteropServices.CallingConvention CallingConvention) { }
+    public ExportDllAttribute(string exportName, CallingConvention CallingConvention) { }
 }

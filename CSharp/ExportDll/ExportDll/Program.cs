@@ -15,8 +15,7 @@ namespace ExportDll
     /// http://thermidor.tistory.com/1397
     /// https://www.codeproject.com/Articles/16310/How-to-Automate-Exporting-NET-Function-to-Unmanage
     /// </summary>
-
-    enum ParserState
+    internal enum ParserState
     {
         Normal,
         ClassDeclaration,
@@ -27,48 +26,49 @@ namespace ExportDll
         Method,
         DeleteExportAttribute,
     }
-    class Program
+
+    internal class Program
     {
-        static Dictionary<System.Runtime.InteropServices.CallingConvention, string> diccc = new Dictionary<CallingConvention, string>();
-        static bool verbose = false;
+        static readonly Dictionary<CallingConvention, string> DicCallingConvention = new Dictionary<CallingConvention, string>();
+        static bool _verbose;
         static Program()
         {
-            diccc[System.Runtime.InteropServices.CallingConvention.Cdecl] = typeof(CallConvCdecl).FullName;
-            diccc[System.Runtime.InteropServices.CallingConvention.FastCall] = typeof(CallConvFastcall).FullName;
-            diccc[System.Runtime.InteropServices.CallingConvention.StdCall] = typeof(CallConvStdcall).FullName;
-            diccc[System.Runtime.InteropServices.CallingConvention.ThisCall] = typeof(CallConvThiscall).FullName;
-            diccc[System.Runtime.InteropServices.CallingConvention.Winapi] = typeof(CallConvStdcall).FullName;
+            DicCallingConvention[CallingConvention.Cdecl] = typeof(CallConvCdecl).FullName;
+            DicCallingConvention[CallingConvention.FastCall] = typeof(CallConvFastcall).FullName;
+            DicCallingConvention[CallingConvention.StdCall] = typeof(CallConvStdcall).FullName;
+            DicCallingConvention[CallingConvention.ThisCall] = typeof(CallConvThiscall).FullName;
+            DicCallingConvention[CallingConvention.Winapi] = typeof(CallConvStdcall).FullName;
         }
 
-        static void Log(bool forced, string message, params object[] param)
+        private static void Log(bool forced, string message, params object[] param)
         {
-            if (forced || verbose)
+            if (forced || _verbose)
             {
                 Console.WriteLine(message, param);
             }
         }
 
-        static void Log(string message, params object[] param)
+        private static void Log(string message, params object[] param)
         {
             Log(false, message, param);
         }
 
-        static void Load()
+        private static void Load()
         {
             var dic = new Dictionary<string, Dictionary<string, KeyValuePair<string, string>>>();
-            Assembly assembly = Assembly.ReflectionOnlyLoadFrom((string)AppDomain.CurrentDomain.GetData("filepath"));
-            Type[] types = assembly.GetTypes();
-            int exportscount = 0;
-            foreach (Type type in types)
+            var assembly = Assembly.ReflectionOnlyLoadFrom((string)AppDomain.CurrentDomain.GetData("filepath"));
+            var types = assembly.GetTypes();
+            var exportCount = 0;
+            foreach (var type in types)
             {
-                MemberInfo[] mis = type.FindMembers(MemberTypes.All, BindingFlags.Public | BindingFlags.Static, new MemberFilter((mi, obj) => true), null);
-                foreach (MemberInfo mi in mis)
+                var mis = type.FindMembers(MemberTypes.All, BindingFlags.Public | BindingFlags.Static, (mi, obj) => true, null);
+                foreach (var mi in mis)
                 {
                     var attrs = CustomAttributeData.GetCustomAttributes(mi);
                     foreach (var attr in attrs)
-                        if (attr.Constructor.ReflectedType.FullName == "ExportDllAttribute")
+                        if (attr.Constructor.ReflectedType != null && attr.Constructor.ReflectedType.FullName == "ExportDllAttribute")
                         {
-                            if (!dic.ContainsKey(type.FullName))
+                            if (!dic.ContainsKey(type.FullName ?? throw new InvalidOperationException()))
                                 dic[type.FullName] = new Dictionary<string, KeyValuePair<string, string>>();
                             switch (attr.ConstructorArguments.Count)
                             {
@@ -79,21 +79,19 @@ namespace ExportDll
                                     dic[type.FullName][mi.Name] = new KeyValuePair<string, string>((string)attr.ConstructorArguments[0].Value, typeof(CallConvStdcall).FullName);
                                     break;
                                 case 2:
-                                    dic[type.FullName][mi.Name] = new KeyValuePair<string, string>((string)attr.ConstructorArguments[0].Value, diccc[(CallingConvention)attr.ConstructorArguments[1].Value]);
-                                    break;
-                                default:
+                                    dic[type.FullName][mi.Name] = new KeyValuePair<string, string>((string)attr.ConstructorArguments[0].Value, DicCallingConvention[(CallingConvention)attr.ConstructorArguments[1].Value]);
                                     break;
                             }
-                            exportscount++;
+                            exportCount++;
                         }
                 }
             }
-            AppDomain.CurrentDomain.SetData("exportscount", exportscount);
+            AppDomain.CurrentDomain.SetData("exportCount", exportCount);
             AppDomain.CurrentDomain.SetData("dic", dic);
         }
 
 
-        static int Main(string[] args)
+        private static int Main(string[] args)
         {
             try
             {
@@ -102,262 +100,258 @@ namespace ExportDll
                     Log(true, "Parameter error!");
                     return 1;
                 }
-                bool debug = false;
-                List<string> listargs = new List<string>(args);
-                listargs.RemoveAt(0);
-                int deb = listargs.FindIndex(new Predicate<string>(x => x.ToLower().Contains("/debug")));
+                var debug = false;
+                var argsList = new List<string>(args);
+                argsList.RemoveAt(0);
+                var deb = argsList.FindIndex(x => x.ToLower().Contains("/debug"));
                 if (deb > -1)
                     debug = true;
                 else
                 {
-                    int rel = listargs.FindIndex(new Predicate<string>(x => x.ToLower().Contains("/release")));
+                    var rel = argsList.FindIndex(x => x.ToLower().Contains("/release"));
                     if (rel > -1)
                     {
-                        listargs.RemoveAt(rel);
-                        listargs.Add("/optimize");
+                        argsList.RemoveAt(rel);
+                        argsList.Add("/optimize");
                     }
                 }
-                int any = listargs.FindIndex(new Predicate<string>(x => x.ToLower().Contains("/anycpu")));
+                var any = argsList.FindIndex(x => x.ToLower().Contains("/anycpu"));
                 if (any > -1)
                 {
-                    listargs.RemoveAt(any);
+                    argsList.RemoveAt(any);
                 }
                 else
                 {
-                    int x64 = listargs.FindIndex(new Predicate<string>(x => x.ToLower().Contains("/x64")));
+                    var x64 = argsList.FindIndex(x => x.ToLower().Contains("/x64"));
                     if (x64 > -1)
                     {
-                        listargs.Add("/PE64");
+                        argsList.Add("/PE64");
                     }
                 }
-                int verb = listargs.FindIndex(new Predicate<string>(x => x.ToLower().Contains("/verbose")));
+                var verb = argsList.FindIndex(x => x.ToLower().Contains("/verbose"));
                 if (verb > -1)
                 {
-                    verbose = true;
-                    listargs.RemoveAt(verb);
+                    _verbose = true;
+                    argsList.RemoveAt(verb);
                 }
-                string filepath = args[0];
-                string path = System.IO.Path.GetDirectoryName(filepath);
+                var filepath = args[0];
+                var path = System.IO.Path.GetDirectoryName(filepath);
                 if (path == string.Empty)
                 {
                     Log(true, "Full path needed!");
                     return 1;
                 }
-                string ext = System.IO.Path.GetExtension(filepath);
+                var ext = System.IO.Path.GetExtension(filepath);
                 if (ext != ".dll")
                 {
                     Log(true, "Target should be dll!");
                     return 1;
                 }
 
-                AppDomain domain = AppDomain.CreateDomain("ReflectionOnly");
-                domain.ReflectionOnlyAssemblyResolve += new ResolveEventHandler(CurrentDomain_ReflectionOnlyAssemblyResolve);
+                var domain = AppDomain.CreateDomain("ReflectionOnly");
+                domain.ReflectionOnlyAssemblyResolve += CurrentDomain_ReflectionOnlyAssemblyResolve;
                 domain.SetData("filepath", filepath);
-                domain.DoCallBack(new CrossAppDomainDelegate(Program.Load));
+                domain.DoCallBack(Load);
                 var dic = (Dictionary<string, Dictionary<string, KeyValuePair<string, string>>>)domain.GetData("dic");
-                int exportscount = (int)domain.GetData("exportscount");
+                var exportCount = (int)domain.GetData("exportCount");
                 AppDomain.Unload(domain);
-                if (exportscount > 0)
+                if (exportCount > 0)
                 {
-                    int exportpos = 1;
-                    string filename = System.IO.Path.GetFileNameWithoutExtension(filepath);
-                    System.IO.Directory.SetCurrentDirectory(path);
-                    Process proc = new Process();
-                    string arguments = string.Format("/nobar{1}/out:{0}.il {0}.dll", filename, debug ? " /linenum " : " ");
+                    var exportPos = 1;
+                    var filename = System.IO.Path.GetFileNameWithoutExtension(filepath);
+                    System.IO.Directory.SetCurrentDirectory(path ?? throw new InvalidOperationException());
+                    var proc = new Process();
+                    var arguments = string.Format("/nobar{1}/out:{0}.il {0}.dll", filename, debug ? " /linenum " : " ");
                     Log("Deassebly file with arguments '{0}'", arguments);
-                    System.Diagnostics.ProcessStartInfo info = new ProcessStartInfo(Properties.Settings.Default.ildasmpath, arguments);
-                    info.UseShellExecute = false;
-                    info.CreateNoWindow = false;
-                    info.RedirectStandardOutput = true;
+                    var info = new ProcessStartInfo(Properties.Settings.Default.ildasmpath, arguments)
+                    {
+                        UseShellExecute = false, CreateNoWindow = false, RedirectStandardOutput = true
+                    };
                     proc.StartInfo = info;
                     proc.Start();
                     proc.WaitForExit();
                     Log(proc.ExitCode != 0, proc.StandardOutput.ReadToEnd());
                     if (proc.ExitCode != 0)
                         return proc.ExitCode;
-                    List<string> wholeilfile = new List<string>();
-                    System.IO.StreamReader sr = new System.IO.StreamReader(System.IO.Path.Combine(path, filename + ".il"), Encoding.Default);
-                    string methoddeclaration = "";
-                    string methodname = "";
-                    string classdeclaration = "";
-                    string methodbefore = "";
-                    string methodafter = "";
-                    int methodpos = 0;
-                    Stack<string> classnames = new Stack<string>();
-                    List<string> externassembly = new List<string>();
-                    ParserState state = ParserState.Normal;
+                    var wholeIlFile = new List<string>();
+                    var sr = new System.IO.StreamReader(System.IO.Path.Combine(path, filename + ".il"), Encoding.Default);
+                    var methodDeclaration = "";
+                    var methodName = "";
+                    var classDeclaration = "";
+                    var methodBefore = "";
+                    var methodAfter = "";
+                    var methodPos = 0;
+                    var classNames = new Stack<string>();
+                    var state = ParserState.Normal;
                     while (!sr.EndOfStream)
                     {
-                        string line = sr.ReadLine();
-                        string trimedline = line.Trim();
-                        bool addilne = true;
+                        var line = sr.ReadLine();
+                        if (line == null) continue;
+                        var trimmedLine = line.Trim();
+                        var addLine = true;
                         switch (state)
                         {
                             case ParserState.Normal:
-                                if (trimedline.StartsWith(".class"))
+                                if (trimmedLine.StartsWith(".class"))
                                 {
                                     state = ParserState.ClassDeclaration;
-                                    addilne = false;
-                                    classdeclaration = trimedline;
+                                    addLine = false;
+                                    classDeclaration = trimmedLine;
                                 }
-                                else if (trimedline.StartsWith(".assembly extern ExportDll"))
+                                else if (trimmedLine.StartsWith(".assembly extern ExportDll"))
                                 {
-                                    addilne = false;
+                                    addLine = false;
                                     state = ParserState.DeleteExportDependency;
                                     Log("Deleting ExportDllAttribute dependency.");
                                 }
                                 break;
                             case ParserState.DeleteExportDependency:
-                                if (trimedline.StartsWith("}"))
+                                if (trimmedLine.StartsWith("}"))
                                 {
                                     state = ParserState.Normal;
                                 }
-                                addilne = false;
+                                addLine = false;
                                 break;
                             case ParserState.ClassDeclaration:
-                                if (trimedline.StartsWith("{"))
+                                if (trimmedLine.StartsWith("{"))
                                 {
                                     state = ParserState.Class;
-                                    string classname = "";
-                                    System.Text.RegularExpressions.Regex reg = new System.Text.RegularExpressions.Regex(@".+\s+([^\s]+) extends \[.*");
-                                    System.Text.RegularExpressions.Match m = reg.Match(classdeclaration);
+                                    var classname = "";
+                                    var reg = new System.Text.RegularExpressions.Regex(@".+\s+([^\s]+) extends \[.*");
+                                    var m = reg.Match(classDeclaration);
                                     if (m.Groups.Count > 1)
                                         classname = m.Groups[1].Value;
                                     classname = classname.Replace("'", "");
-                                    if (classnames.Count > 0)
-                                        classname = classnames.Peek() + "+" + classname;
-                                    classnames.Push(classname);
+                                    if (classNames.Count > 0)
+                                        classname = classNames.Peek() + "+" + classname;
+                                    classNames.Push(classname);
                                     Log("Found class: " + classname);
-                                    wholeilfile.Add(classdeclaration);
+                                    wholeIlFile.Add(classDeclaration);
                                 }
                                 else
                                 {
-                                    classdeclaration += " " + trimedline;
-                                    addilne = false;
+                                    classDeclaration += " " + trimmedLine;
+                                    addLine = false;
                                 }
                                 break;
                             case ParserState.Class:
-                                if (trimedline.StartsWith(".class"))
+                                if (trimmedLine.StartsWith(".class"))
                                 {
                                     state = ParserState.ClassDeclaration;
-                                    addilne = false;
-                                    classdeclaration = trimedline;
+                                    addLine = false;
+                                    classDeclaration = trimmedLine;
                                 }
-                                else if (trimedline.StartsWith(".method"))
+                                else if (trimmedLine.StartsWith(".method"))
                                 {
-                                    if (dic.ContainsKey(classnames.Peek()))
+                                    if (dic.ContainsKey(classNames.Peek()))
                                     {
-                                        methoddeclaration = trimedline;
-                                        addilne = false;
+                                        methodDeclaration = trimmedLine;
+                                        addLine = false;
                                         state = ParserState.MethodDeclaration;
                                     }
                                 }
-                                else if (trimedline.StartsWith("} // end of class"))
+                                else if (trimmedLine.StartsWith("} // end of class"))
                                 {
-                                    classnames.Pop();
-                                    if (classnames.Count > 0)
-                                        state = ParserState.Class;
-                                    else
-                                        state = ParserState.Normal;
+                                    classNames.Pop();
+                                    state = classNames.Count > 0 ? ParserState.Class : ParserState.Normal;
                                 }
                                 break;
                             case ParserState.MethodDeclaration:
-                                if (trimedline.StartsWith("{"))
+                                if (trimmedLine.StartsWith("{"))
                                 {
-                                    System.Text.RegularExpressions.Regex reg = new System.Text.RegularExpressions.Regex(@"(?<before>[^\(]+(\(\s[^\)]+\))*\s)(?<method>[^\(]+)(?<after>\(.*)");
-                                    System.Text.RegularExpressions.Match m = reg.Match(methoddeclaration);
+                                    var reg = new System.Text.RegularExpressions.Regex(@"(?<before>[^\(]+(\(\s[^\)]+\))*\s)(?<method>[^\(]+)(?<after>\(.*)");
+                                    var m = reg.Match(methodDeclaration);
                                     if (m.Groups.Count > 3)
                                     {
-                                        methodbefore = m.Groups["before"].Value;
-                                        methodafter = m.Groups["after"].Value;
-                                        methodname = m.Groups["method"].Value;
+                                        methodBefore = m.Groups["before"].Value;
+                                        methodAfter = m.Groups["after"].Value;
+                                        methodName = m.Groups["method"].Value;
                                     }
-                                    Log("Found method: " + methodname);
-                                    if (dic[classnames.Peek()].ContainsKey(methodname))
+                                    Log("Found method: " + methodName);
+                                    if (dic[classNames.Peek()].ContainsKey(methodName))
                                     {
-                                        methodpos = wholeilfile.Count;
+                                        methodPos = wholeIlFile.Count;
                                         state = ParserState.MethodProperties;
                                     }
                                     else
                                     {
-                                        wholeilfile.Add(methoddeclaration);
+                                        wholeIlFile.Add(methodDeclaration);
                                         state = ParserState.Method;
-                                        methodpos = 0;
+                                        methodPos = 0;
                                     }
                                 }
                                 else
                                 {
-                                    methoddeclaration += " " + trimedline;
-                                    addilne = false;
+                                    methodDeclaration += " " + trimmedLine;
+                                    addLine = false;
                                 }
                                 break;
                             case ParserState.Method:
-                                if (trimedline.StartsWith("} // end of method"))
+                                if (trimmedLine.StartsWith("} // end of method"))
                                 {
                                     state = ParserState.Class;
                                 }
                                 break;
                             case ParserState.MethodProperties:
-                                if (trimedline.StartsWith(".custom instance void [ExportDll"))
+                                if (trimmedLine.StartsWith(".custom instance void [ExportDll"))
                                 {
-                                    addilne = false;
+                                    addLine = false;
                                     state = ParserState.DeleteExportAttribute;
                                 }
-                                else if (trimedline.StartsWith("// Code") || trimedline.StartsWith("// 코드 크기"))
+                                else if (trimmedLine.StartsWith("// Code") || trimmedLine.StartsWith("// 코드 크기"))
                                 {
                                     state = ParserState.Method;
-                                    if (methodpos != 0)
-                                        wholeilfile.Insert(methodpos, methoddeclaration);
+                                    if (methodPos != 0)
+                                        wholeIlFile.Insert(methodPos, methodDeclaration);
                                 }
                                 break;
                             case ParserState.DeleteExportAttribute:
-                                if (trimedline.StartsWith(".custom") || trimedline.StartsWith("// Code") || trimedline.StartsWith("// 코드 크기"))
+                                if (trimmedLine.StartsWith(".custom") || trimmedLine.StartsWith("// Code") || trimmedLine.StartsWith("// 코드 크기"))
                                 {
-                                    KeyValuePair<string, string> attr = dic[classnames.Peek()][methodname];
-                                    if (methodbefore.Contains("marshal( "))
+                                    var attr = dic[classNames.Peek()][methodName];
+                                    if (methodBefore.Contains("marshal( "))
                                     {
-                                        int pos = methodbefore.IndexOf("marshal( ");
-                                        methodbefore = methodbefore.Insert(pos, "modopt([mscorlib]" + attr.Value + ") ");
-                                        methoddeclaration = methodbefore + methodname + methodafter;
+                                        var pos = methodBefore.IndexOf("marshal( ", StringComparison.Ordinal);
+                                        methodBefore = methodBefore.Insert(pos, "modopt([mscorlib]" + attr.Value + ") ");
+                                        methodDeclaration = methodBefore + methodName + methodAfter;
                                     }
                                     else
                                         Log("\tChanging calling convention: " + attr.Value);
-                                    if (methodpos != 0)
-                                        wholeilfile.Insert(methodpos, methoddeclaration);
-                                    if (methodname == "DllMain")
-                                        wholeilfile.Add(" .entrypoint");
-                                    wholeilfile.Add(string.Format(".export [{0}] as {1}", exportpos, dic[classnames.Peek()][methodname].Key));
-
-                                    Log("\tAdding .vtentry:{0} .export:{1}", exportpos, dic[classnames.Peek()][methodname].Key);
-                                    exportpos++;
+                                    if (methodPos != 0)
+                                        wholeIlFile.Insert(methodPos, methodDeclaration);
+                                    if (methodName == "DllMain")
+                                        wholeIlFile.Add(" .entrypoint");
+                                    wholeIlFile.Add($".export [{exportPos}] as {dic[classNames.Peek()][methodName].Key}");
+                                    Log("\tAdding .vtentry:{0} .export:{1}", exportPos, dic[classNames.Peek()][methodName].Key);
+                                    exportPos++;
                                     state = ParserState.Method;
                                 }
                                 else
-                                    addilne = false;
+                                    addLine = false;
                                 break;
                         }
-                        if (addilne)
-                            wholeilfile.Add(line);
+                        if (addLine)
+                            wholeIlFile.Add(line);
                     }
                     sr.Close();
-                    System.IO.StreamWriter sw = new System.IO.StreamWriter(System.IO.File.Open(System.IO.Path.Combine(path, filename + ".il"), System.IO.FileMode.Create), Encoding.Default);
-                    foreach (string line in wholeilfile)
+                    var sw = new System.IO.StreamWriter(System.IO.File.Open(System.IO.Path.Combine(path, filename + ".il"), System.IO.FileMode.Create), Encoding.Default);
+                    foreach (var line in wholeIlFile)
                     {
                         sw.WriteLine(line);
                     }
                     sw.Close();
-                    string res = filename + ".res";
+                    var res = filename + ".res";
                     if (System.IO.File.Exists(filename + ".res"))
                         res = " /resource=" + res;
                     else
                         res = "";
                     proc = new Process();
-                    arguments = string.Format("/nologo /quiet /out:{0}.dll {0}.il /DLL{1} {2}", filename, res, string.Join(" ", listargs.ToArray()));
+                    arguments = string.Format("/nologo /quiet /out:{0}.dll {0}.il /DLL{1} {2}", filename, res, string.Join(" ", argsList.ToArray()));
                     Log("Compiling file with arguments '{0}'", arguments);
-                    info = new ProcessStartInfo(Properties.Settings.Default.ildasmpath2, arguments);
-                    info.UseShellExecute = false;
-                    info.CreateNoWindow = false;
-                    info.RedirectStandardOutput = true;
+                    info = new ProcessStartInfo(Properties.Settings.Default.ildasmpath2, arguments)
+                    {
+                        UseShellExecute = false, CreateNoWindow = false, RedirectStandardOutput = true
+                    };
                     proc.StartInfo = info;
                     proc.Start();
                     proc.WaitForExit();
