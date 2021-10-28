@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportDllAttribute", "Expor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpDll", "charpDll\CSharpDll.csproj", "{D03A2F11-2B1C-434C-8B3A-5A2216A65384}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImportDllTest", "CSharpDllImportTest\ImportDllTest.csproj", "{3BD34A03-8114-40D3-A220-0D4BFD8286B6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImportDllTest", "ImportDllTest\ImportDllTest.csproj", "{3BD34A03-8114-40D3-A220-0D4BFD8286B6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
