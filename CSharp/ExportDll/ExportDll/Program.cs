@@ -91,14 +91,14 @@ namespace ExportDll
         }
 
 
-        private static int Main(string[] args)
+        private static void Main(string[] args)
         {
             try
             {
                 if (args.Length < 1)
                 {
                     Log(true, "Parameter error!");
-                    return 1;
+                    return;
                 }
                 var debug = false;
                 var argsList = new List<string>(args);
@@ -139,13 +139,13 @@ namespace ExportDll
                 if (path == string.Empty)
                 {
                     Log(true, "Full path needed!");
-                    return 1;
+                    return;
                 }
                 var ext = System.IO.Path.GetExtension(filepath);
                 if (ext != ".dll")
                 {
                     Log(true, "Target should be dll!");
-                    return 1;
+                    return;
                 }
 
                 var domain = AppDomain.CreateDomain("ReflectionOnly");
@@ -172,7 +172,10 @@ namespace ExportDll
                     proc.WaitForExit();
                     Log(proc.ExitCode != 0, proc.StandardOutput.ReadToEnd());
                     if (proc.ExitCode != 0)
-                        return proc.ExitCode;
+                    {
+                        Console.WriteLine($"ExitCode: {proc.ExitCode}");
+                        return;
+                    }
                     var wholeIlFile = new List<string>();
                     var sr = new System.IO.StreamReader(System.IO.Path.Combine(path, filename + ".il"), Encoding.Default);
                     var methodDeclaration = "";
@@ -357,15 +360,19 @@ namespace ExportDll
                     proc.WaitForExit();
                     Log(proc.ExitCode != 0, proc.StandardOutput.ReadToEnd());
                     if (proc.ExitCode != 0)
-                        return proc.ExitCode;
+                    {
+                        Console.WriteLine($"ExitCode: {proc.ExitCode}");
+                        return;
+                    }
+                    Console.WriteLine("Export 성공");
                 }
+                else
+                    Console.WriteLine("ExportDll Attribute Count가 0 입니다.");
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                return -1;
             }
-            return 0;
         }
 
         static Assembly CurrentDomain_ReflectionOnlyAssemblyResolve(object sender, ResolveEventArgs args)
