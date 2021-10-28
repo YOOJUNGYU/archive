@@ -1,9 +1,13 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31112.23
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportDll", "ExportDll\ExportDll.csproj", "{7A60A470-00E6-4DE2-9068-FDC4DE26F525}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportDllAttribute", "ExportDllAttribute\ExportDllAttribute.csproj", "{1D6730D0-97B5-4CF1-BC11-9C1D6E4DD87C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpDll", "charpDll\CSharpDll.csproj", "{D03A2F11-2B1C-434C-8B3A-5A2216A65384}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,8 +39,23 @@ Global
 		{1D6730D0-97B5-4CF1-BC11-9C1D6E4DD87C}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{1D6730D0-97B5-4CF1-BC11-9C1D6E4DD87C}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{1D6730D0-97B5-4CF1-BC11-9C1D6E4DD87C}.Release|x86.ActiveCfg = Release|Any CPU
+		{D03A2F11-2B1C-434C-8B3A-5A2216A65384}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D03A2F11-2B1C-434C-8B3A-5A2216A65384}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D03A2F11-2B1C-434C-8B3A-5A2216A65384}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{D03A2F11-2B1C-434C-8B3A-5A2216A65384}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{D03A2F11-2B1C-434C-8B3A-5A2216A65384}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D03A2F11-2B1C-434C-8B3A-5A2216A65384}.Debug|x86.Build.0 = Debug|Any CPU
+		{D03A2F11-2B1C-434C-8B3A-5A2216A65384}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D03A2F11-2B1C-434C-8B3A-5A2216A65384}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D03A2F11-2B1C-434C-8B3A-5A2216A65384}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{D03A2F11-2B1C-434C-8B3A-5A2216A65384}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{D03A2F11-2B1C-434C-8B3A-5A2216A65384}.Release|x86.ActiveCfg = Release|Any CPU
+		{D03A2F11-2B1C-434C-8B3A-5A2216A65384}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9E365FCB-AC42-4C25-BC94-C997D75A2723}
 	EndGlobalSection
 EndGlobal
