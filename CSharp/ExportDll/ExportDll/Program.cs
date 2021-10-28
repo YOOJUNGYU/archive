@@ -8,6 +8,13 @@ using System.Runtime.CompilerServices;
 
 namespace ExportDll
 {
+    /// <summary>
+    /// c# 으로 만든 dll 을 Export 시켜 다른 곳에서 사용할 수 있도록 해주는 실행파일입니다.
+    /// export 시키고자 하는 dll 을 ExportDll.exe 파일이 빌드되는 위치에 넣고,
+    /// 속성 > 디버그 > 명령줄인수에 dll파일의 경로(FullPath)를 넣어주고 exe 를 실행시킵니다
+    /// http://thermidor.tistory.com/1397
+    /// https://www.codeproject.com/Articles/16310/How-to-Automate-Exporting-NET-Function-to-Unmanage
+    /// </summary>
 
     enum ParserState
     {
@@ -169,7 +176,7 @@ namespace ExportDll
                     if (proc.ExitCode != 0)
                         return proc.ExitCode;
                     List<string> wholeilfile = new List<string>();
-                    System.IO.StreamReader sr = System.IO.File.OpenText(System.IO.Path.Combine(path, filename + ".il"));
+                    System.IO.StreamReader sr = new System.IO.StreamReader(System.IO.Path.Combine(path, filename + ".il"), Encoding.Default);
                     string methoddeclaration = "";
                     string methodname = "";
                     string classdeclaration = "";
@@ -296,7 +303,7 @@ namespace ExportDll
                                     addilne = false;
                                     state = ParserState.DeleteExportAttribute;
                                 }
-                                else if (trimedline.StartsWith("// Code"))
+                                else if (trimedline.StartsWith("// Code") || trimedline.StartsWith("// 코드 크기"))
                                 {
                                     state = ParserState.Method;
                                     if (methodpos != 0)
@@ -304,7 +311,7 @@ namespace ExportDll
                                 }
                                 break;
                             case ParserState.DeleteExportAttribute:
-                                if (trimedline.StartsWith(".custom") || trimedline.StartsWith("// Code"))
+                                if (trimedline.StartsWith(".custom") || trimedline.StartsWith("// Code") || trimedline.StartsWith("// 코드 크기"))
                                 {
                                     KeyValuePair<string, string> attr = dic[classnames.Peek()][methodname];
                                     if (methodbefore.Contains("marshal( "))
@@ -333,7 +340,7 @@ namespace ExportDll
                             wholeilfile.Add(line);
                     }
                     sr.Close();
-                    System.IO.StreamWriter sw = System.IO.File.CreateText(System.IO.Path.Combine(path, filename + ".il"));
+                    System.IO.StreamWriter sw = new System.IO.StreamWriter(System.IO.File.Open(System.IO.Path.Combine(path, filename + ".il"), System.IO.FileMode.Create), Encoding.Default);
                     foreach (string line in wholeilfile)
                     {
                         sw.WriteLine(line);
@@ -347,7 +354,7 @@ namespace ExportDll
                     proc = new Process();
                     arguments = string.Format("/nologo /quiet /out:{0}.dll {0}.il /DLL{1} {2}", filename, res, string.Join(" ", listargs.ToArray()));
                     Log("Compiling file with arguments '{0}'", arguments);
-                    info = new ProcessStartInfo(Properties.Settings.Default.ilasmpath, arguments);
+                    info = new ProcessStartInfo(Properties.Settings.Default.ildasmpath2, arguments);
                     info.UseShellExecute = false;
                     info.CreateNoWindow = false;
                     info.RedirectStandardOutput = true;
