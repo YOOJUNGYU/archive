@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace ImportDllTest
 {
-    class Program
+    internal class Program
     {
         [DllImport("CSharpDll.dll", CharSet = CharSet.Ansi, SetLastError = true)]
         private static extern string StringTest(string str);
