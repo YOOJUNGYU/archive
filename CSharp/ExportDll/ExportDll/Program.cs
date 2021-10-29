@@ -29,8 +29,7 @@ namespace ExportDll
 
     internal class Program
     {
-        static readonly Dictionary<CallingConvention, string> DicCallingConvention = new Dictionary<CallingConvention, string>();
-        static bool _verbose;
+        private static readonly Dictionary<CallingConvention, string> DicCallingConvention = new Dictionary<CallingConvention, string>();
         static Program()
         {
             DicCallingConvention[CallingConvention.Cdecl] = typeof(CallConvCdecl).FullName;
@@ -38,19 +37,6 @@ namespace ExportDll
             DicCallingConvention[CallingConvention.StdCall] = typeof(CallConvStdcall).FullName;
             DicCallingConvention[CallingConvention.ThisCall] = typeof(CallConvThiscall).FullName;
             DicCallingConvention[CallingConvention.Winapi] = typeof(CallConvStdcall).FullName;
-        }
-
-        private static void Log(bool forced, string message, params object[] param)
-        {
-            if (forced || _verbose)
-            {
-                Console.WriteLine(message, param);
-            }
-        }
-
-        private static void Log(string message, params object[] param)
-        {
-            Log(false, message, param);
         }
 
         private static void Load()
@@ -97,7 +83,7 @@ namespace ExportDll
             {
                 if (args.Length < 1)
                 {
-                    Log(true, "Parameter error!");
+                    Console.WriteLine("Parameter error!");
                     return;
                 }
                 var debug = false;
@@ -131,20 +117,21 @@ namespace ExportDll
                 var verb = argsList.FindIndex(x => x.ToLower().Contains("/verbose"));
                 if (verb > -1)
                 {
-                    _verbose = true;
                     argsList.RemoveAt(verb);
                 }
                 var filepath = args[0];
+                Console.WriteLine($"[FilePath]: {filepath}");
                 var path = System.IO.Path.GetDirectoryName(filepath);
+                Console.WriteLine($"[Path]: {path}");
                 if (path == string.Empty)
                 {
-                    Log(true, "Full path needed!");
+                    Console.WriteLine("Full path needed!");
                     return;
                 }
                 var ext = System.IO.Path.GetExtension(filepath);
                 if (ext != ".dll")
                 {
-                    Log(true, "Target should be dll!");
+                    Console.WriteLine("Target should be dll!");
                     return;
                 }
 
@@ -159,10 +146,11 @@ namespace ExportDll
                 {
                     var exportPos = 1;
                     var filename = System.IO.Path.GetFileNameWithoutExtension(filepath);
+                    Console.WriteLine($"[fileName]: {filename}");
                     System.IO.Directory.SetCurrentDirectory(path ?? throw new InvalidOperationException());
                     var proc = new Process();
                     var arguments = string.Format("/nobar{1}/out:{0}.il {0}.dll", filename, debug ? " /linenum " : " ");
-                    Log("Deassebly file with arguments '{0}'", arguments);
+                    Console.WriteLine($"/tdisassembly file with arguments: {arguments}");
                     var info = new ProcessStartInfo(Properties.Settings.Default.ildasmpath, arguments)
                     {
                         UseShellExecute = false, CreateNoWindow = false, RedirectStandardOutput = true
@@ -170,7 +158,6 @@ namespace ExportDll
                     proc.StartInfo = info;
                     proc.Start();
                     proc.WaitForExit();
-                    Log(proc.ExitCode != 0, proc.StandardOutput.ReadToEnd());
                     if (proc.ExitCode != 0)
                     {
                         Console.WriteLine($"ExitCode: {proc.ExitCode}");
@@ -191,6 +178,7 @@ namespace ExportDll
                         var line = sr.ReadLine();
                         if (line == null) continue;
                         var trimmedLine = line.Trim();
+                        Console.WriteLine($"[trimmedLine]: {trimmedLine}");
                         var addLine = true;
                         switch (state)
                         {
@@ -205,7 +193,7 @@ namespace ExportDll
                                 {
                                     addLine = false;
                                     state = ParserState.DeleteExportDependency;
-                                    Log("Deleting ExportDllAttribute dependency.");
+                                    Console.WriteLine("Deleting ExportDllAttribute dependency.");
                                 }
                                 break;
                             case ParserState.DeleteExportDependency:
@@ -228,7 +216,8 @@ namespace ExportDll
                                     if (classNames.Count > 0)
                                         classname = classNames.Peek() + "+" + classname;
                                     classNames.Push(classname);
-                                    Log("Found class: " + classname);
+                                    Console.WriteLine($"\tFound class: {classname}");
+                                    Console.WriteLine($"\tClassDeclaration: { classDeclaration}");
                                     wholeIlFile.Add(classDeclaration);
                                 }
                                 else
@@ -270,7 +259,7 @@ namespace ExportDll
                                         methodAfter = m.Groups["after"].Value;
                                         methodName = m.Groups["method"].Value;
                                     }
-                                    Log("Found method: " + methodName);
+                                    Console.WriteLine($"\tFound method: {methodName}");
                                     if (dic[classNames.Peek()].ContainsKey(methodName))
                                     {
                                         methodPos = wholeIlFile.Count;
@@ -319,13 +308,13 @@ namespace ExportDll
                                         methodDeclaration = methodBefore + methodName + methodAfter;
                                     }
                                     else
-                                        Log("\tChanging calling convention: " + attr.Value);
+                                        Console.WriteLine($"\tChanging calling convention: {attr.Value}");
                                     if (methodPos != 0)
                                         wholeIlFile.Insert(methodPos, methodDeclaration);
                                     if (methodName == "DllMain")
                                         wholeIlFile.Add(" .entrypoint");
                                     wholeIlFile.Add($".export [{exportPos}] as {dic[classNames.Peek()][methodName].Key}");
-                                    Log("\tAdding .vtentry:{0} .export:{1}", exportPos, dic[classNames.Peek()][methodName].Key);
+                                    Console.WriteLine($"\tAdding .vtentry:{exportPos} .export:{dic[classNames.Peek()][methodName].Key}");
                                     exportPos++;
                                     state = ParserState.Method;
                                 }
@@ -350,7 +339,7 @@ namespace ExportDll
                         res = "";
                     proc = new Process();
                     arguments = string.Format("/nologo /quiet /out:{0}.dll {0}.il /DLL{1} {2}", filename, res, string.Join(" ", argsList.ToArray()));
-                    Log("Compiling file with arguments '{0}'", arguments);
+                    Console.WriteLine($"\tCompiling file with arguments: {arguments}");
                     info = new ProcessStartInfo(Properties.Settings.Default.ildasmpath2, arguments)
                     {
                         UseShellExecute = false, CreateNoWindow = false, RedirectStandardOutput = true
@@ -358,13 +347,12 @@ namespace ExportDll
                     proc.StartInfo = info;
                     proc.Start();
                     proc.WaitForExit();
-                    Log(proc.ExitCode != 0, proc.StandardOutput.ReadToEnd());
                     if (proc.ExitCode != 0)
                     {
                         Console.WriteLine($"ExitCode: {proc.ExitCode}");
                         return;
                     }
-                    Console.WriteLine("Export 성공");
+                    Console.WriteLine("=============== Export 성공 ===============");
                 }
                 else
                     Console.WriteLine("ExportDll Attribute Count가 0 입니다.");
