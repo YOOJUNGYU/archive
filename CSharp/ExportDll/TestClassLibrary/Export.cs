@@ -31,7 +31,7 @@ namespace TestClassLibrary
             return null;
         }
 
-        [ExportDllAttribute("StringTest", CallingConvention.StdCall)]
+        [ExportDll("StringTest", CallingConvention.StdCall)]
         public static string StringTest(string str)
             => $"받은 내용: {str}";
 

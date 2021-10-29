@@ -362,6 +362,12 @@ namespace ExportDll
                     var target = Path.Combine(targetPath, filename + ".dll");
                     File.Copy(source, target, true);
                     Console.WriteLine($"[복사] {source} => {target}");
+
+                    var jsonDllSource = Path.Combine(path, "Newtonsoft.Json.dll");
+                    var jsonDllTarget = Path.Combine(targetPath, "Newtonsoft.Json.dll");
+                    File.Copy(jsonDllSource, jsonDllTarget, true);
+                    Console.WriteLine($"[복사] {jsonDllSource} => {jsonDllTarget}");
+
                     Console.WriteLine("=============== Export 성공 ===============");
                 }
                 else
