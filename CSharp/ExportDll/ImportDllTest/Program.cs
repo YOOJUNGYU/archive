@@ -26,6 +26,5 @@ namespace ImportDllTest
                 Console.WriteLine(ex.Message);
             }
         }
-
     }
 }

@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -121,14 +122,14 @@ namespace ExportDll
                 }
                 var filepath = args[0];
                 Console.WriteLine($"[FilePath]: {filepath}");
-                var path = System.IO.Path.GetDirectoryName(filepath);
+                var path = Path.GetDirectoryName(filepath);
                 Console.WriteLine($"[Path]: {path}");
                 if (path == string.Empty)
                 {
                     Console.WriteLine("Full path needed!");
                     return;
                 }
-                var ext = System.IO.Path.GetExtension(filepath);
+                var ext = Path.GetExtension(filepath);
                 if (ext != ".dll")
                 {
                     Console.WriteLine("Target should be dll!");
@@ -145,9 +146,9 @@ namespace ExportDll
                 if (exportCount > 0)
                 {
                     var exportPos = 1;
-                    var filename = System.IO.Path.GetFileNameWithoutExtension(filepath);
+                    var filename = Path.GetFileNameWithoutExtension(filepath);
                     Console.WriteLine($"[fileName]: {filename}");
-                    System.IO.Directory.SetCurrentDirectory(path ?? throw new InvalidOperationException());
+                    Directory.SetCurrentDirectory(path ?? throw new InvalidOperationException());
                     var proc = new Process();
                     var arguments = string.Format("/nobar{1}/out:{0}.il {0}.dll", filename, debug ? " /linenum " : " ");
                     Console.WriteLine($"/tdisassembly file with arguments: {arguments}");
@@ -164,7 +165,7 @@ namespace ExportDll
                         return;
                     }
                     var wholeIlFile = new List<string>();
-                    var sr = new System.IO.StreamReader(System.IO.Path.Combine(path, filename + ".il"), Encoding.Default);
+                    var sr = new StreamReader(Path.Combine(path, filename + ".il"), Encoding.Default);
                     var methodDeclaration = "";
                     var methodName = "";
                     var classDeclaration = "";
@@ -326,14 +327,14 @@ namespace ExportDll
                             wholeIlFile.Add(line);
                     }
                     sr.Close();
-                    var sw = new System.IO.StreamWriter(System.IO.File.Open(System.IO.Path.Combine(path, filename + ".il"), System.IO.FileMode.Create), Encoding.Default);
+                    var sw = new StreamWriter(File.Open(Path.Combine(path, filename + ".il"), FileMode.Create), Encoding.Default);
                     foreach (var line in wholeIlFile)
                     {
                         sw.WriteLine(line);
                     }
                     sw.Close();
                     var res = filename + ".res";
-                    if (System.IO.File.Exists(filename + ".res"))
+                    if (File.Exists(filename + ".res"))
                         res = " /resource=" + res;
                     else
                         res = "";
@@ -352,6 +353,15 @@ namespace ExportDll
                         Console.WriteLine($"ExitCode: {proc.ExitCode}");
                         return;
                     }
+#if DEBUG
+                    var targetPath = "C:\\GIT\\archive\\CSharp\\ExportDll\\ImportDllTest\\bin\\Debug"; // 환경에 맞게 경로 설정 필요
+#else
+                    var targetPath = "C:\\GIT\\archive\\CSharp\\ExportDll\\ImportDllTest\\bin\\Release"; // 환경에 맞게 경로 설정 필요
+#endif
+                    var source = Path.Combine(path, filename + ".dll");
+                    var target = Path.Combine(targetPath, filename + ".dll");
+                    File.Copy(source, target, true);
+                    Console.WriteLine($"[복사] {source} => {target}");
                     Console.WriteLine("=============== Export 성공 ===============");
                 }
                 else
