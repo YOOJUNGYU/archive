@@ -13,12 +13,21 @@ namespace CustomForm
         [DllImport("user32.DLL", EntryPoint = "SendMessage")]
         private static extern void SendMessage(IntPtr hWnd, int wMsg, int wParam, int lParam);
 
+        private enum CustomWindowState
+        {
+            Restored,
+            Maximized
+        }
+
         private DateTime _lastClick;
         private bool _inDoubleClick;
         private Rectangle _doubleClickArea;
         private TimeSpan _doubleClickMaxTime;
-        private Action _doubleClickAction;
+        private Action _doubleClickMaximize;
+        private Action _doubleClickRestore;
         private Timer _clickTimer;
+
+        private CustomWindowState _customWindowState;
         private Point _windowRestorePoint;
         private int _windowRestoreHeight;
         private int _windowRestoreWidth;
@@ -31,12 +40,14 @@ namespace CustomForm
 
         private void InitializeMouseClick()
         {
+            _customWindowState = CustomWindowState.Restored;
             _doubleClickMaxTime = TimeSpan.FromMilliseconds(SystemInformation.DoubleClickTime);
 
             _clickTimer = new Timer { Interval = SystemInformation.DoubleClickTime };
             _clickTimer.Tick += ClickTimer_Tick;
 
-            _doubleClickAction = FormMaximize;
+            _doubleClickMaximize = FormMaximize;
+            _doubleClickRestore = FormRestore;
         }
 
         private void FormMaximize()
@@ -57,6 +68,14 @@ namespace CustomForm
             btnWindowRestore.BringToFront();
         }
 
+        private void FormRestore()
+        {
+            Location = _windowRestorePoint;
+            Height = _windowRestoreHeight;
+            Width = _windowRestoreWidth;
+            btnWindowMaximize.BringToFront();
+        }
+
         private void ClickTimer_Tick(object sender, EventArgs e)
         {
             _inDoubleClick = false;
@@ -68,24 +87,27 @@ namespace CustomForm
             if (_inDoubleClick)
             {
                 _inDoubleClick = false;
-
                 var length = DateTime.Now - _lastClick;
-
                 // If double click is valid, respond
                 if (!_doubleClickArea.Contains(e.Location) || length >= _doubleClickMaxTime) return;
                 _clickTimer.Stop();
-                _doubleClickAction();
-
+                switch (_customWindowState)
+                {
+                    case CustomWindowState.Restored:
+                        _doubleClickMaximize();
+                        break;
+                    case CustomWindowState.Maximized:
+                        _doubleClickRestore();
+                        break;
+                }
                 return;
             }
-
             // Double click was invalid, restart 
             _clickTimer.Stop();
             _clickTimer.Start();
             _lastClick = DateTime.Now;
             _inDoubleClick = true;
             _doubleClickArea = new Rectangle(e.Location, SystemInformation.DoubleClickSize);
-
             btnWindowMaximize.BringToFront();
             ReleaseCapture();
             SendMessage(Handle, 0x112, 0xf012, 0);
@@ -93,15 +115,9 @@ namespace CustomForm
 
         private void btnWindowMinimize_Click(object sender, EventArgs e)
             => WindowState = FormWindowState.Minimized;
-        
 
         private void btnWindowRestore_Click(object sender, EventArgs e)
-        {
-            Location = _windowRestorePoint;
-            Height = _windowRestoreHeight;
-            Width = _windowRestoreWidth;
-            btnWindowMaximize.BringToFront();
-        }
+            => FormRestore();
 
         private void btnWindowMaximize_Click(object sender, EventArgs e)
             => FormMaximize();

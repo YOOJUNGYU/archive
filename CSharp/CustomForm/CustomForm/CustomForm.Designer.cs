@@ -48,9 +48,9 @@ namespace CustomForm
             this.pnlTitleBar.Controls.Add(this.btnWindowRestore);
             this.pnlTitleBar.Controls.Add(this.btnWindowClose);
             this.pnlTitleBar.Dock = System.Windows.Forms.DockStyle.Top;
-            this.pnlTitleBar.Location = new System.Drawing.Point(0, 0);
+            this.pnlTitleBar.Location = new System.Drawing.Point(5, 0);
             this.pnlTitleBar.Name = "pnlTitleBar";
-            this.pnlTitleBar.Size = new System.Drawing.Size(800, 35);
+            this.pnlTitleBar.Size = new System.Drawing.Size(790, 35);
             this.pnlTitleBar.TabIndex = 3;
             this.pnlTitleBar.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pnlTitleBar_MouseDown);
             // 
@@ -73,7 +73,7 @@ namespace CustomForm
             this.btnWindowMinimize.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.ActiveBorder;
             this.btnWindowMinimize.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnWindowMinimize.Image = global::CustomForm.Properties.Resources.window_minimize;
-            this.btnWindowMinimize.Location = new System.Drawing.Point(687, 0);
+            this.btnWindowMinimize.Location = new System.Drawing.Point(677, 0);
             this.btnWindowMinimize.Margin = new System.Windows.Forms.Padding(5);
             this.btnWindowMinimize.Name = "btnWindowMinimize";
             this.btnWindowMinimize.Size = new System.Drawing.Size(35, 35);
@@ -89,7 +89,7 @@ namespace CustomForm
             this.btnWindowMaximize.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.ActiveBorder;
             this.btnWindowMaximize.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnWindowMaximize.Image = global::CustomForm.Properties.Resources.window_maximize;
-            this.btnWindowMaximize.Location = new System.Drawing.Point(725, 0);
+            this.btnWindowMaximize.Location = new System.Drawing.Point(715, 0);
             this.btnWindowMaximize.Margin = new System.Windows.Forms.Padding(5);
             this.btnWindowMaximize.Name = "btnWindowMaximize";
             this.btnWindowMaximize.Size = new System.Drawing.Size(35, 35);
@@ -105,7 +105,7 @@ namespace CustomForm
             this.btnWindowRestore.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.ActiveBorder;
             this.btnWindowRestore.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnWindowRestore.Image = global::CustomForm.Properties.Resources.window_restore;
-            this.btnWindowRestore.Location = new System.Drawing.Point(725, 0);
+            this.btnWindowRestore.Location = new System.Drawing.Point(715, 0);
             this.btnWindowRestore.Margin = new System.Windows.Forms.Padding(5);
             this.btnWindowRestore.Name = "btnWindowRestore";
             this.btnWindowRestore.Size = new System.Drawing.Size(35, 35);
@@ -121,7 +121,7 @@ namespace CustomForm
             this.btnWindowClose.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
             this.btnWindowClose.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnWindowClose.Image = global::CustomForm.Properties.Resources.window_close;
-            this.btnWindowClose.Location = new System.Drawing.Point(763, 0);
+            this.btnWindowClose.Location = new System.Drawing.Point(753, 0);
             this.btnWindowClose.Margin = new System.Windows.Forms.Padding(5);
             this.btnWindowClose.Name = "btnWindowClose";
             this.btnWindowClose.Size = new System.Drawing.Size(35, 35);
@@ -132,20 +132,21 @@ namespace CustomForm
             // pnlMain
             // 
             this.pnlMain.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pnlMain.Location = new System.Drawing.Point(0, 0);
+            this.pnlMain.Location = new System.Drawing.Point(5, 35);
             this.pnlMain.Name = "pnlMain";
-            this.pnlMain.Size = new System.Drawing.Size(800, 450);
+            this.pnlMain.Size = new System.Drawing.Size(790, 410);
             this.pnlMain.TabIndex = 4;
             // 
-            // Form1
+            // CustomForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.ControlBox = false;
-            this.Controls.Add(this.pnlTitleBar);
             this.Controls.Add(this.pnlMain);
-            this.Name = "Form1";
+            this.Controls.Add(this.pnlTitleBar);
+            this.Name = "CustomForm";
+            this.Padding = new System.Windows.Forms.Padding(5, 0, 5, 5);
             this.pnlTitleBar.ResumeLayout(false);
             this.pnlTitleBar.PerformLayout();
             this.ResumeLayout(false);
