@@ -237,6 +237,9 @@ namespace CustomForm
             _movingCornerBottomLeft = _onCornerBottomLeft;
         }
 
+        private void CustomForm_MouseUp(object sender, MouseEventArgs e)
+            => StopResize();
+
         private void CustomForm_MouseMove(object sender, MouseEventArgs e)
         {
             if (_customWindowState == CustomWindowState.Maximized) { return; }
@@ -284,10 +287,6 @@ namespace CustomForm
             else
                 OnResizeOff();
         }
-
-        private void CustomForm_MouseUp(object sender, MouseEventArgs e)
-            => StopResize();
-        
 
         private void pnlMain_MouseMove(object sender, MouseEventArgs e)
             => OnResizeOff();
