@@ -290,7 +290,10 @@ namespace CustomForm
         }
 
         private void CustomForm_MouseUp(object sender, MouseEventArgs e)
-            => StopResize();
+        {
+            StopResize();
+            OnResizeOff();
+        }
 
         private void CustomForm_MouseMove(object sender, MouseEventArgs e)
         {
