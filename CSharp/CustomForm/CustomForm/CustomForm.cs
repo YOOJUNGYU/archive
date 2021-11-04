@@ -37,8 +37,8 @@ namespace CustomForm
         #endregion
 
         #region resize
-        private bool _onMinimumSize;
         private const int BorderThickness = 5;
+        private bool _onMinimumSize;
         private bool _onBorderRight;
         private bool _onBorderLeft;
         private bool _onBorderTop;
@@ -56,7 +56,6 @@ namespace CustomForm
         private bool _movingCornerBottomRight;
         private bool _movingCornerBottomLeft;
         #endregion
-
 
         public CustomForm()
         {
@@ -81,8 +80,7 @@ namespace CustomForm
             _windowRestorePoint = Location;
             _windowRestoreHeight = Height;
             _windowRestoreWidth = Width;
-            _customWindowState = CustomWindowState.Maximized;
-
+            
             var bounds = Screen.FromHandle(Handle).WorkingArea;
             var xOffset = SystemInformation.HorizontalResizeBorderThickness + SystemInformation.FixedFrameBorderSize.Width;
             var yOffset = SystemInformation.VerticalResizeBorderThickness + SystemInformation.FixedFrameBorderSize.Height;
@@ -93,6 +91,7 @@ namespace CustomForm
             Width = bounds.Width;
             Height = bounds.Height;
             btnWindowRestore.BringToFront();
+            _customWindowState = CustomWindowState.Maximized;
         }
 
         private void FormRestore()
@@ -108,15 +107,15 @@ namespace CustomForm
         {
             if (_movingCornerTopRight)
             {
-                Width = (Cursor.Position.X - Location.X);
-                Height = ((Location.Y - Cursor.Position.Y) + Height);
+                Width = Cursor.Position.X - Location.X;
+                Height = Location.Y - Cursor.Position.Y + Height;
                 Location = new Point(Location.X, Cursor.Position.Y);
             }
             else if (_movingCornerTopLeft)
             {
-                Width = ((Width + Location.X) - Cursor.Position.X);
+                Width = Width + Location.X - Cursor.Position.X;
                 Location = new Point(Cursor.Position.X, Location.Y);
-                Height = ((Height + Location.Y) - Cursor.Position.Y);
+                Height = Height + Location.Y - Cursor.Position.Y;
                 Location = new Point(Location.X, Cursor.Position.Y);
             }
             else if (_movingCornerBottomRight)
@@ -126,8 +125,8 @@ namespace CustomForm
             }
             else if (_movingCornerBottomLeft)
             {
-                Width = ((Width + Location.X) - Cursor.Position.X);
-                Height = (Cursor.Position.Y - Location.Y);
+                Width = Width + Location.X - Cursor.Position.X;
+                Height = Cursor.Position.Y - Location.Y;
                 Location = new Point(Cursor.Position.X, Location.Y);
             }
             else if (_movingRight)
@@ -136,17 +135,17 @@ namespace CustomForm
             }
             else if (_movingLeft)
             {
-                Width = ((Width + Location.X) - Cursor.Position.X);
+                Width = Width + Location.X - Cursor.Position.X;
                 Location = new Point(Cursor.Position.X, Location.Y);
             }
             else if (_movingTop)
             {
-                Height = ((Height + Location.Y) - Cursor.Position.Y);
+                Height = Height + Location.Y - Cursor.Position.Y;
                 Location = new Point(Location.X, Cursor.Position.Y);
             }
             else if (_movingBottom)
             {
-                Height = (Cursor.Position.Y - Location.Y);
+                Height = Cursor.Position.Y - Location.Y;
             }
         }
 
@@ -285,9 +284,7 @@ namespace CustomForm
             { Cursor = Cursors.SizeNESW; _onCornerBottomLeft = true; }
 
             else
-            {
                 OnResizeOff();
-            }
         }
 
         private void CustomForm_MouseUp(object sender, MouseEventArgs e)
