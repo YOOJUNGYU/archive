@@ -148,7 +148,7 @@ namespace CustomForm
             this.Controls.Add(this.pnlMain);
             this.Controls.Add(this.pnlTitleBar);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.MinimumSize = new System.Drawing.Size(300, 300);
+            this.MinimumSize = new System.Drawing.Size(450, 300);
             this.Name = "CustomForm";
             this.Padding = new System.Windows.Forms.Padding(5);
             this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.CustomForm_MouseDown);
