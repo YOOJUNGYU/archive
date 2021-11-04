@@ -151,6 +151,7 @@ namespace CustomForm
             this.MinimumSize = new System.Drawing.Size(450, 300);
             this.Name = "CustomForm";
             this.Padding = new System.Windows.Forms.Padding(5);
+            this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.CustomForm_MouseDown);
             this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.CustomForm_MouseMove);
             this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.CustomForm_MouseUp);

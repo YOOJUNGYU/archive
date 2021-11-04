@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
@@ -44,7 +45,7 @@ namespace CustomForm
         private bool _onBorderTop;
         private bool _onBorderBottom;
         private bool _onCornerTopRight;
-        private bool _onCornerTopLeft;
+        private bool _onCornerTopLeft; 
         private bool _onCornerBottomRight;
         private bool _onCornerBottomLeft;
         private bool _movingRight;
@@ -61,6 +62,7 @@ namespace CustomForm
         {
             InitializeComponent();
             InitializeMouseClick();
+            LoadSetting();
         }
 
         private void InitializeMouseClick()
@@ -73,6 +75,49 @@ namespace CustomForm
 
             _doubleClickMaximize = FormMaximize;
             _doubleClickRestore = FormRestore;
+        }
+
+        private void LoadSetting()
+        {
+            var savedLocation = new Point(Properties.Settings.Default.FormX, Properties.Settings.Default.FormY);
+            Width = Properties.Settings.Default.FormWidth;
+            Height = Properties.Settings.Default.FormHeight;
+            Location = IsLocationInWorkingArea(savedLocation, Width, Height) ? savedLocation : new Point(0, 0);
+            var bound = Screen.FromHandle(Handle).WorkingArea;
+            if (Width < bound.Width || Height < bound.Height) return;
+            btnWindowRestore.BringToFront();
+            _customWindowState = CustomWindowState.Maximized;
+        }
+
+        private static bool IsLocationInWorkingArea(Point location, int width, int height)
+        {
+            const int tolerance = 10;
+            var leftX = location.X + tolerance;
+            var topY = location.Y + tolerance;
+            var rightX = location.X + width - tolerance;
+            var bottomY = location.Y + height - tolerance;
+
+            var points = new List<Point>
+            {
+                new Point(leftX, topY),
+                new Point(rightX, topY),
+                new Point(leftX, bottomY),
+                new Point(rightX,bottomY)
+            };
+
+            var isLocationInWorkingArea = true;
+            foreach (var screen in Screen.AllScreens)
+            {
+                isLocationInWorkingArea = true;
+                foreach (var point in points)
+                {
+                    if (!screen.WorkingArea.Contains(point))
+                        isLocationInWorkingArea = false;
+                }
+                if (isLocationInWorkingArea) break;
+            }
+
+            return isLocationInWorkingArea;
         }
 
         private void FormMaximize()
@@ -222,7 +267,14 @@ namespace CustomForm
             => FormMaximize();
 
         private void btnWindowClose_Click(object sender, EventArgs e)
-            => Close();
+        {
+            Properties.Settings.Default.FormX = Location.X;
+            Properties.Settings.Default.FormY = Location.Y;
+            Properties.Settings.Default.FormHeight = Height;
+            Properties.Settings.Default.FormWidth = Width;
+            Properties.Settings.Default.Save();
+            Close();
+        }
 
         private void CustomForm_MouseDown(object sender, MouseEventArgs e)
         {

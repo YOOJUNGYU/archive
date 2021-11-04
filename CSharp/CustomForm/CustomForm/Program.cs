@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace CustomForm
@@ -16,6 +13,7 @@ namespace CustomForm
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            AppSettingsProvider.ApplyProvider(Properties.Settings.Default);
             Application.Run(new CustomForm());
         }
     }
