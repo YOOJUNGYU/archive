@@ -53,6 +53,7 @@ namespace CustomForm
             this.pnlTitleBar.Size = new System.Drawing.Size(790, 35);
             this.pnlTitleBar.TabIndex = 3;
             this.pnlTitleBar.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pnlTitleBar_MouseDown);
+            this.pnlTitleBar.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pnlTitleBar_MouseMove);
             // 
             // lblTitle
             // 
@@ -136,6 +137,7 @@ namespace CustomForm
             this.pnlMain.Name = "pnlMain";
             this.pnlMain.Size = new System.Drawing.Size(790, 405);
             this.pnlMain.TabIndex = 4;
+            this.pnlMain.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pnlMain_MouseMove);
             // 
             // CustomForm
             // 
