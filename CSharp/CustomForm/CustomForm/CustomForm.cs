@@ -189,7 +189,6 @@ namespace CustomForm
             {
                 _inDoubleClick = false;
                 var length = DateTime.Now - _lastClick;
-                // If double click is valid, respond
                 if (!_doubleClickArea.Contains(e.Location) || length >= _doubleClickMaxTime) return;
                 _clickTimer.Stop();
                 switch (_customWindowState)
@@ -203,7 +202,6 @@ namespace CustomForm
                 }
                 return;
             }
-            // Double click was invalid, restart 
             _clickTimer.Stop();
             _clickTimer.Start();
             _lastClick = DateTime.Now;
