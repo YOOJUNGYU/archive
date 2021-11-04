@@ -41,14 +41,14 @@ namespace CustomForm
             // 
             // pnlTitleBar
             // 
-            this.pnlTitleBar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
+            this.pnlTitleBar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(48)))));
             this.pnlTitleBar.Controls.Add(this.lblTitle);
             this.pnlTitleBar.Controls.Add(this.btnWindowMinimize);
             this.pnlTitleBar.Controls.Add(this.btnWindowMaximize);
             this.pnlTitleBar.Controls.Add(this.btnWindowRestore);
             this.pnlTitleBar.Controls.Add(this.btnWindowClose);
             this.pnlTitleBar.Dock = System.Windows.Forms.DockStyle.Top;
-            this.pnlTitleBar.Location = new System.Drawing.Point(5, 0);
+            this.pnlTitleBar.Location = new System.Drawing.Point(5, 5);
             this.pnlTitleBar.Name = "pnlTitleBar";
             this.pnlTitleBar.Size = new System.Drawing.Size(790, 35);
             this.pnlTitleBar.TabIndex = 3;
@@ -132,21 +132,26 @@ namespace CustomForm
             // pnlMain
             // 
             this.pnlMain.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pnlMain.Location = new System.Drawing.Point(5, 35);
+            this.pnlMain.Location = new System.Drawing.Point(5, 40);
             this.pnlMain.Name = "pnlMain";
-            this.pnlMain.Size = new System.Drawing.Size(790, 410);
+            this.pnlMain.Size = new System.Drawing.Size(790, 405);
             this.pnlMain.TabIndex = 4;
             // 
             // CustomForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(48)))));
             this.ClientSize = new System.Drawing.Size(800, 450);
-            this.ControlBox = false;
             this.Controls.Add(this.pnlMain);
             this.Controls.Add(this.pnlTitleBar);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.MinimumSize = new System.Drawing.Size(300, 300);
             this.Name = "CustomForm";
-            this.Padding = new System.Windows.Forms.Padding(5, 0, 5, 5);
+            this.Padding = new System.Windows.Forms.Padding(5);
+            this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.CustomForm_MouseDown);
+            this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.CustomForm_MouseMove);
+            this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.CustomForm_MouseUp);
             this.pnlTitleBar.ResumeLayout(false);
             this.pnlTitleBar.PerformLayout();
             this.ResumeLayout(false);
