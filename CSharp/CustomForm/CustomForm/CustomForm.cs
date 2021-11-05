@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
@@ -38,24 +39,14 @@ namespace CustomForm
         #endregion
 
         #region resize
-        private const int BorderThickness = 5;
-        private bool _onMinimumSize;
-        private bool _onBorderRight;
-        private bool _onBorderLeft;
-        private bool _onBorderTop;
-        private bool _onBorderBottom;
-        private bool _onCornerTopRight;
-        private bool _onCornerTopLeft; 
-        private bool _onCornerBottomRight;
-        private bool _onCornerBottomLeft;
-        private bool _movingRight;
-        private bool _movingLeft;
-        private bool _movingTop;
-        private bool _movingBottom;
-        private bool _movingCornerTopRight;
-        private bool _movingCornerTopLeft;
-        private bool _movingCornerBottomRight;
-        private bool _movingCornerBottomLeft;
+        private int _oldLocationX;
+        private int _oldLocationY;
+        private int _oldWidth;
+        private int _oldHeight;
+        private bool _resizeRight;
+        private bool _resizeLeft;
+        private bool _resizeTop;
+        private bool _resizeBottom;
         #endregion
 
         public CustomForm()
@@ -148,80 +139,6 @@ namespace CustomForm
             _customWindowState = CustomWindowState.Restored;
         }
 
-        private void StartResize()
-        {
-            if (_movingCornerTopRight)
-            {
-                Width = Cursor.Position.X - Location.X;
-                Height = Location.Y - Cursor.Position.Y + Height;
-                Location = new Point(Location.X, Cursor.Position.Y);
-            }
-            else if (_movingCornerTopLeft)
-            {
-                Width = Width + Location.X - Cursor.Position.X;
-                Location = new Point(Cursor.Position.X, Location.Y);
-                Height = Height + Location.Y - Cursor.Position.Y;
-                Location = new Point(Location.X, Cursor.Position.Y);
-            }
-            else if (_movingCornerBottomRight)
-            {
-                Width = Cursor.Position.X - Location.X;
-                Height = Cursor.Position.Y - Location.Y;
-            }
-            else if (_movingCornerBottomLeft)
-            {
-                Width = Width + Location.X - Cursor.Position.X;
-                Height = Cursor.Position.Y - Location.Y;
-                Location = new Point(Cursor.Position.X, Location.Y);
-            }
-            else if (_movingRight)
-            {
-                Width = Cursor.Position.X - Location.X;
-            }
-            else if (_movingLeft)
-            {
-                Width = Width + Location.X - Cursor.Position.X;
-                Location = new Point(Cursor.Position.X, Location.Y);
-            }
-            else if (_movingTop)
-            {
-                Height = Height + Location.Y - Cursor.Position.Y;
-                Location = new Point(Location.X, Cursor.Position.Y);
-            }
-            else if (_movingBottom)
-            {
-                Height = Cursor.Position.Y - Location.Y;
-            }
-        }
-
-        private void StopResize()
-        {
-            _movingRight = false;
-            _movingLeft = false;
-            _movingTop = false;
-            _movingBottom = false;
-            _movingCornerTopRight = false;
-            _movingCornerTopLeft = false;
-            _movingCornerBottomRight = false;
-            _movingCornerBottomLeft = false;
-            Cursor = Cursors.Default;
-            System.Threading.Thread.Sleep(300);
-            _onMinimumSize = false;
-        }
-
-        private void OnResizeOff()
-        {
-            _onBorderRight = false;
-            _onBorderLeft = false;
-            _onBorderTop = false;
-            _onBorderBottom = false;
-            _onCornerTopRight = false;
-            _onCornerTopLeft = false;
-            _onCornerBottomRight = false;
-            _onCornerBottomLeft = false;
-            Cursor = Cursors.Default;
-        }
-
         private void ClickTimer_Tick(object sender, EventArgs e)
         {
             _inDoubleClick = false;
@@ -276,77 +193,116 @@ namespace CustomForm
             Close();
         }
 
-        private void CustomForm_MouseDown(object sender, MouseEventArgs e)
+        #region Resize
+        private void pnlResizeBorder_MouseLeave(object sender, EventArgs e)
+            => Cursor = Cursors.Default;
+        
+
+        #region ResizeTop
+        private void pnlResizeBorderTop_MouseHover(object sender, EventArgs e)
+            => Cursor = Cursors.SizeNS;
+
+        private void pnlResizeBorderTop_MouseDown(object sender, MouseEventArgs e)
         {
             if (e.Button != MouseButtons.Left) return;
-            _movingRight = _onBorderRight;
-            _movingLeft = _onBorderLeft;
-            _movingTop = _onBorderTop;
-            _movingBottom = _onBorderBottom;
-            _movingCornerTopRight = _onCornerTopRight;
-            _movingCornerTopLeft = _onCornerTopLeft;
-            _movingCornerBottomRight = _onCornerBottomRight;
-            _movingCornerBottomLeft = _onCornerBottomLeft;
+            _resizeTop = true;
+            _oldLocationY = Location.Y;
+            _oldHeight = Height;
         }
 
-        private void CustomForm_MouseUp(object sender, MouseEventArgs e)
+        private void pnlResizeBorderTop_MouseUp(object sender, MouseEventArgs e)
         {
-            StopResize();
-            OnResizeOff();
+            if (e.Button != MouseButtons.Left) return;
+            _resizeTop = false;
+            Cursor = Cursors.Default;
         }
 
-        private void CustomForm_MouseMove(object sender, MouseEventArgs e)
+        private void pnlResizeBorderTop_MouseMove(object sender, MouseEventArgs e)
         {
-            if (_customWindowState == CustomWindowState.Maximized) { return; }
+            if (!_resizeTop) return;
+            Height = _oldHeight + _oldLocationY - Cursor.Position.Y;
+            if (Height <= MinimumSize.Height) return;
+            Location = new Point(Location.X, Cursor.Position.Y);
+        }
+        #endregion
 
-            if (Width <= MinimumSize.Width) { Width = MinimumSize.Width + 5; _onMinimumSize = true; }
-            if (Height <= MinimumSize.Height) { Height = MinimumSize.Height + 5; _onMinimumSize = true; }
-            if (_onMinimumSize) { StopResize(); } else { StartResize(); }
+        #region ResizeBottom
+        private void pnlResizeBorderBottom_MouseHover(object sender, EventArgs e)
+            => Cursor = Cursors.SizeNS;
 
-            if ((Cursor.Position.X >= Location.X + Width - BorderThickness)
-                & (Cursor.Position.Y >= Location.Y + BorderThickness)
-                & (Cursor.Position.Y <= Location.Y + Height - BorderThickness))
-            { Cursor = Cursors.SizeWE; _onBorderRight = true; }
-
-            else if ((Cursor.Position.X <= Location.X + BorderThickness)
-                & (Cursor.Position.Y >= Location.Y + BorderThickness)
-                & (Cursor.Position.Y <= Location.Y + Height - BorderThickness))
-            { Cursor = Cursors.SizeWE; _onBorderLeft = true; }
-
-            else if ((Cursor.Position.Y <= Location.Y + BorderThickness)
-                & (Cursor.Position.X >= Location.X + BorderThickness)
-                & (Cursor.Position.X <= Location.X + Width - BorderThickness))
-            { Cursor = Cursors.SizeNS; _onBorderTop = true; }
-
-            else if ((Cursor.Position.Y >= Location.Y + Height - BorderThickness)
-                & (Cursor.Position.X >= Location.X + BorderThickness)
-                & (Cursor.Position.X <= Location.X + Width - BorderThickness))
-            { Cursor = Cursors.SizeNS; _onBorderBottom = true; }
-
-            else if (Cursor.Position.X >= Location.X + Width - BorderThickness & Cursor.Position.X <= Location.X + Width
-                & Cursor.Position.Y >= Location.Y & Cursor.Position.Y <= Location.Y + BorderThickness)
-            { Cursor = Cursors.SizeNESW; _onCornerTopRight = true; }
-
-            else if (Cursor.Position.X >= Location.X & Cursor.Position.X <= Location.X + BorderThickness
-                     & Cursor.Position.Y >= Location.Y & Cursor.Position.Y <= Location.Y + BorderThickness)
-            { Cursor = Cursors.SizeNWSE; _onCornerTopLeft = true; }
-
-            else if (Cursor.Position.X >= Location.X + Width - BorderThickness & Cursor.Position.X <= Location.X + Width 
-                     & Cursor.Position.Y >= Location.Y + Height - 5 & Cursor.Position.Y <= Location.Y + Height)
-            { Cursor = Cursors.SizeNWSE; _onCornerBottomRight = true; }
-
-            else if ((Cursor.Position.X == Location.X)
-                & (Cursor.Position.Y == Location.Y + Height - 1))
-            { Cursor = Cursors.SizeNESW; _onCornerBottomLeft = true; }
-
-            else
-                OnResizeOff();
+        private void pnlResizeBorderBottom_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button != MouseButtons.Left) return;
+            _resizeBottom = true;
         }
 
-        private void pnlMain_MouseMove(object sender, MouseEventArgs e)
-            => OnResizeOff();
+        private void pnlResizeBorderBottom_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button != MouseButtons.Left) return;
+            _resizeBottom = false;
+            Cursor = Cursors.Default;
+        }
 
-        private void pnlTitleBar_MouseMove(object sender, MouseEventArgs e)
-            => OnResizeOff();
+        private void pnlResizeBorderBottom_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (!_resizeBottom) return;
+            Height = Cursor.Position.Y - Location.Y;
+        }
+        #endregion
+
+        #region ResizeLeft
+        private void pnlResizeBorderLeft_MouseHover(object sender, EventArgs e)
+            => Cursor = Cursors.SizeWE;
+
+        private void pnlResizeBorderLeft_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button != MouseButtons.Left) return;
+            _resizeLeft = true;
+            _oldLocationX = Location.X;
+            _oldWidth = Width;
+        }
+
+        private void pnlResizeBorderLeft_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button != MouseButtons.Left) return;
+            _resizeLeft = false;
+            Cursor = Cursors.Default;
+        }
+
+        private void pnlResizeBorderLeft_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (!_resizeLeft) return;
+            Width = _oldWidth + _oldLocationX - Cursor.Position.X;
+            if (Width <= MinimumSize.Width) return;
+            Location = new Point(Cursor.Position.X, Location.Y);
+        }
+
+        #endregion
+
+        #region ResizeRight
+        private void pnlResizeBorderRight_MouseHover(object sender, EventArgs e)
+            => Cursor = Cursors.SizeWE;
+
+        private void pnlResizeBorderRight_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button != MouseButtons.Left) return;
+            _resizeRight = true;
+        }
+
+        private void pnlResizeBorderRight_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button != MouseButtons.Left) return;
+            _resizeRight = false;
+            Cursor = Cursors.Default;
+        }
+
+        private void pnlResizeBorderRight_MouseMove(object sender, MouseEventArgs e)
+        {
+            if(!_resizeRight) return;
+            Width = Cursor.Position.X - Location.X;
+        }
+        #endregion
+
+        #endregion
     }
 }
