@@ -36,6 +36,10 @@ namespace CustomForm
             this.btnWindowRestore = new System.Windows.Forms.Button();
             this.btnWindowClose = new System.Windows.Forms.Button();
             this.pnlMain = new System.Windows.Forms.Panel();
+            this.pnlResizeBottomRight = new System.Windows.Forms.Panel();
+            this.pnlResizeBottomLeft = new System.Windows.Forms.Panel();
+            this.pnlResizeTopRight = new System.Windows.Forms.Panel();
+            this.pnlResizeTopLeft = new System.Windows.Forms.Panel();
             this.pnlCenter = new System.Windows.Forms.Panel();
             this.pnlResizeBorderRight = new System.Windows.Forms.Panel();
             this.pnlResizeBorderBottom = new System.Windows.Forms.Panel();
@@ -43,6 +47,8 @@ namespace CustomForm
             this.pnlResizeBorderTop = new System.Windows.Forms.Panel();
             this.pnlTitleBar.SuspendLayout();
             this.pnlCenter.SuspendLayout();
+            this.pnlResizeBorderBottom.SuspendLayout();
+            this.pnlResizeBorderTop.SuspendLayout();
             this.SuspendLayout();
             // 
             // pnlTitleBar
@@ -143,6 +149,58 @@ namespace CustomForm
             this.pnlMain.Size = new System.Drawing.Size(800, 415);
             this.pnlMain.TabIndex = 4;
             // 
+            // pnlResizeBottomRight
+            // 
+            this.pnlResizeBottomRight.Dock = System.Windows.Forms.DockStyle.Right;
+            this.pnlResizeBottomRight.Location = new System.Drawing.Point(780, 0);
+            this.pnlResizeBottomRight.Name = "pnlResizeBottomRight";
+            this.pnlResizeBottomRight.Size = new System.Drawing.Size(10, 5);
+            this.pnlResizeBottomRight.TabIndex = 3;
+            this.pnlResizeBottomRight.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pnlResizeBottomRight_MouseDown);
+            this.pnlResizeBottomRight.MouseLeave += new System.EventHandler(this.pnlResizeBorder_MouseLeave);
+            this.pnlResizeBottomRight.MouseHover += new System.EventHandler(this.pnlResizeBottomRight_MouseHover);
+            this.pnlResizeBottomRight.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pnlResizeBottomRight_MouseMove);
+            this.pnlResizeBottomRight.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pnlResizeBottomRight_MouseUp);
+            // 
+            // pnlResizeBottomLeft
+            // 
+            this.pnlResizeBottomLeft.Dock = System.Windows.Forms.DockStyle.Left;
+            this.pnlResizeBottomLeft.Location = new System.Drawing.Point(0, 0);
+            this.pnlResizeBottomLeft.Name = "pnlResizeBottomLeft";
+            this.pnlResizeBottomLeft.Size = new System.Drawing.Size(10, 5);
+            this.pnlResizeBottomLeft.TabIndex = 2;
+            this.pnlResizeBottomLeft.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pnlResizeBottomLeft_MouseDown);
+            this.pnlResizeBottomLeft.MouseLeave += new System.EventHandler(this.pnlResizeBorder_MouseLeave);
+            this.pnlResizeBottomLeft.MouseHover += new System.EventHandler(this.pnlResizeBottomLeft_MouseHover);
+            this.pnlResizeBottomLeft.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pnlResizeBottomLeft_MouseMove);
+            this.pnlResizeBottomLeft.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pnlResizeBottomLeft_MouseUp);
+            // 
+            // pnlResizeTopRight
+            // 
+            this.pnlResizeTopRight.Dock = System.Windows.Forms.DockStyle.Right;
+            this.pnlResizeTopRight.Location = new System.Drawing.Point(1260, 0);
+            this.pnlResizeTopRight.Name = "pnlResizeTopRight";
+            this.pnlResizeTopRight.Size = new System.Drawing.Size(10, 5);
+            this.pnlResizeTopRight.TabIndex = 0;
+            this.pnlResizeTopRight.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pnlResizeTopRight_MouseDown);
+            this.pnlResizeTopRight.MouseLeave += new System.EventHandler(this.pnlResizeBorder_MouseLeave);
+            this.pnlResizeTopRight.MouseHover += new System.EventHandler(this.pnlResizeTopRight_MouseHover);
+            this.pnlResizeTopRight.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pnlResizeTopRight_MouseMove);
+            this.pnlResizeTopRight.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pnlResizeTopRight_MouseUp);
+            // 
+            // pnlResizeTopLeft
+            // 
+            this.pnlResizeTopLeft.Dock = System.Windows.Forms.DockStyle.Left;
+            this.pnlResizeTopLeft.Location = new System.Drawing.Point(0, 0);
+            this.pnlResizeTopLeft.Name = "pnlResizeTopLeft";
+            this.pnlResizeTopLeft.Size = new System.Drawing.Size(10, 5);
+            this.pnlResizeTopLeft.TabIndex = 1;
+            this.pnlResizeTopLeft.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pnlResizeTopLeft_MouseDown);
+            this.pnlResizeTopLeft.MouseLeave += new System.EventHandler(this.pnlResizeBorder_MouseLeave);
+            this.pnlResizeTopLeft.MouseHover += new System.EventHandler(this.pnlResizeTopLeft_MouseHover);
+            this.pnlResizeTopLeft.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pnlResizeTopLeft_MouseMove);
+            this.pnlResizeTopLeft.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pnlResizeTopLeft_MouseUp);
+            // 
             // pnlCenter
             // 
             this.pnlCenter.Controls.Add(this.pnlMain);
@@ -170,11 +228,13 @@ namespace CustomForm
             // 
             // pnlResizeBorderBottom
             // 
+            this.pnlResizeBorderBottom.Controls.Add(this.pnlResizeBottomLeft);
+            this.pnlResizeBorderBottom.Controls.Add(this.pnlResizeBottomRight);
             this.pnlResizeBorderBottom.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.pnlResizeBorderBottom.Location = new System.Drawing.Point(0, 445);
+            this.pnlResizeBorderBottom.Location = new System.Drawing.Point(5, 445);
             this.pnlResizeBorderBottom.Margin = new System.Windows.Forms.Padding(0);
             this.pnlResizeBorderBottom.Name = "pnlResizeBorderBottom";
-            this.pnlResizeBorderBottom.Size = new System.Drawing.Size(795, 5);
+            this.pnlResizeBorderBottom.Size = new System.Drawing.Size(790, 5);
             this.pnlResizeBorderBottom.TabIndex = 2;
             this.pnlResizeBorderBottom.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pnlResizeBorderBottom_MouseDown);
             this.pnlResizeBorderBottom.MouseLeave += new System.EventHandler(this.pnlResizeBorder_MouseLeave);
@@ -188,7 +248,7 @@ namespace CustomForm
             this.pnlResizeBorderLeft.Location = new System.Drawing.Point(0, 0);
             this.pnlResizeBorderLeft.Margin = new System.Windows.Forms.Padding(0);
             this.pnlResizeBorderLeft.Name = "pnlResizeBorderLeft";
-            this.pnlResizeBorderLeft.Size = new System.Drawing.Size(5, 445);
+            this.pnlResizeBorderLeft.Size = new System.Drawing.Size(5, 450);
             this.pnlResizeBorderLeft.TabIndex = 3;
             this.pnlResizeBorderLeft.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pnlResizeBorderLeft_MouseDown);
             this.pnlResizeBorderLeft.MouseLeave += new System.EventHandler(this.pnlResizeBorder_MouseLeave);
@@ -198,6 +258,8 @@ namespace CustomForm
             // 
             // pnlResizeBorderTop
             // 
+            this.pnlResizeBorderTop.Controls.Add(this.pnlResizeTopLeft);
+            this.pnlResizeBorderTop.Controls.Add(this.pnlResizeTopRight);
             this.pnlResizeBorderTop.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlResizeBorderTop.Location = new System.Drawing.Point(5, 0);
             this.pnlResizeBorderTop.Margin = new System.Windows.Forms.Padding(0);
@@ -216,9 +278,9 @@ namespace CustomForm
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(48)))));
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.pnlResizeBorderBottom);
             this.Controls.Add(this.pnlResizeBorderTop);
             this.Controls.Add(this.pnlResizeBorderLeft);
-            this.Controls.Add(this.pnlResizeBorderBottom);
             this.Controls.Add(this.pnlResizeBorderRight);
             this.Controls.Add(this.pnlCenter);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
@@ -228,6 +290,8 @@ namespace CustomForm
             this.pnlTitleBar.ResumeLayout(false);
             this.pnlTitleBar.PerformLayout();
             this.pnlCenter.ResumeLayout(false);
+            this.pnlResizeBorderBottom.ResumeLayout(false);
+            this.pnlResizeBorderTop.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -246,6 +310,10 @@ namespace CustomForm
         private System.Windows.Forms.Panel pnlResizeBorderBottom;
         private System.Windows.Forms.Panel pnlResizeBorderLeft;
         private System.Windows.Forms.Panel pnlResizeBorderTop;
+        private System.Windows.Forms.Panel pnlResizeBottomRight;
+        private System.Windows.Forms.Panel pnlResizeBottomLeft;
+        private System.Windows.Forms.Panel pnlResizeTopRight;
+        private System.Windows.Forms.Panel pnlResizeTopLeft;
     }
 }
 

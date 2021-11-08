@@ -47,6 +47,10 @@ namespace CustomForm
         private bool _resizeLeft;
         private bool _resizeTop;
         private bool _resizeBottom;
+        private bool _resizeTopLeft;
+        private bool _resizeTopRight;
+        private bool _resizeBottomLeft;
+        private bool _resizeBottomRight;
         #endregion
 
         public CustomForm()
@@ -301,6 +305,126 @@ namespace CustomForm
             if(!_resizeRight) return;
             Width = Cursor.Position.X - Location.X;
         }
+        #endregion
+
+        #region ResizeTopLeft
+
+        private void pnlResizeTopLeft_MouseHover(object sender, EventArgs e)
+            => Cursor = Cursors.SizeNWSE;
+
+        private void pnlResizeTopLeft_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button != MouseButtons.Left) return;
+            _resizeTopLeft = true;
+            _oldLocationX = Location.X;
+            _oldWidth = Width;
+            _oldLocationY = Location.Y;
+            _oldHeight = Height;
+        }
+
+        private void pnlResizeTopLeft_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button != MouseButtons.Left) return;
+            _resizeTopLeft = false;
+            Cursor = Cursors.Default;
+        }
+
+        private void pnlResizeTopLeft_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (!_resizeTopLeft) return;
+            Height = _oldHeight + _oldLocationY - Cursor.Position.Y;
+            Width = _oldWidth + _oldLocationX - Cursor.Position.X;
+            Location = new Point(Cursor.Position.X, Cursor.Position.Y);
+        }
+
+        #endregion
+
+        #region ResizeTopRight
+        private void pnlResizeTopRight_MouseHover(object sender, EventArgs e)
+            => Cursor = Cursors.SizeNESW;
+
+        private void pnlResizeTopRight_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button != MouseButtons.Left) return;
+            _resizeTopRight = true;
+            _oldLocationY = Location.Y;
+            _oldHeight = Height;
+        }
+
+        private void pnlResizeTopRight_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button != MouseButtons.Left) return;
+            _resizeTopRight = false;
+            Cursor = Cursors.Default;
+        }
+
+        private void pnlResizeTopRight_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (!_resizeTopRight) return;
+            Height = _oldHeight + _oldLocationY - Cursor.Position.Y;
+            Width = Cursor.Position.X - Location.X;
+            Location = new Point(Location.X, Cursor.Position.Y);
+        }
+
+        #endregion
+
+        #region ResizeBottomLeft
+
+        private void pnlResizeBottomLeft_MouseHover(object sender, EventArgs e)
+            => Cursor = Cursors.SizeNESW;
+
+        private void pnlResizeBottomLeft_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button != MouseButtons.Left) return;
+            _resizeBottomLeft = true;
+            _oldLocationX = Location.X;
+            _oldWidth = Width;
+        }
+
+        private void pnlResizeBottomLeft_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button != MouseButtons.Left) return;
+            _resizeBottomLeft = false;
+            Cursor = Cursors.Default;
+        }
+
+        private void pnlResizeBottomLeft_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (!_resizeBottomLeft) return;
+            Height = Cursor.Position.Y - Location.Y;
+            Width = _oldWidth + _oldLocationX - Cursor.Position.X;
+            if (Width <= MinimumSize.Width) return;
+            Location = new Point(Cursor.Position.X, Location.Y);
+
+        }
+
+        #endregion
+
+        #region ResizetBottomRight
+
+        private void pnlResizeBottomRight_MouseHover(object sender, EventArgs e)
+            => Cursor = Cursors.SizeNWSE;
+
+        private void pnlResizeBottomRight_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button != MouseButtons.Left) return;
+            _resizeBottomRight = true;
+        }
+
+        private void pnlResizeBottomRight_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button != MouseButtons.Left) return;
+            _resizeBottomRight = false;
+            Cursor = Cursors.Default;
+        }
+
+        private void pnlResizeBottomRight_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (!_resizeBottomRight) return;
+            Width = Cursor.Position.X - Location.X;
+            Height = Cursor.Position.Y - Location.Y;
+        }
+
         #endregion
 
         #endregion
