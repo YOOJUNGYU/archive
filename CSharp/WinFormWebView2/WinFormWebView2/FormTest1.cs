@@ -3,9 +3,9 @@ using System.Windows.Forms;
 
 namespace WinFormWebView2
 {
-    public partial class Form1 : Form
+    public partial class FormTest1 : Form
     {
-        public Form1()
+        public FormTest1()
         {
             InitializeComponent();
             webView2.Source = new Uri("https://www.naver.com/");
