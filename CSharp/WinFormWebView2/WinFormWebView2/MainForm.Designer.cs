@@ -32,6 +32,7 @@ namespace WinFormWebView2
             this.pnlForm = new System.Windows.Forms.Panel();
             this.flpButtonZone = new System.Windows.Forms.FlowLayoutPanel();
             this.btnTest1 = new System.Windows.Forms.Button();
+            this.btnTest2 = new System.Windows.Forms.Button();
             this.flpButtonZone.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -48,6 +49,7 @@ namespace WinFormWebView2
             this.flpButtonZone.AutoSize = true;
             this.flpButtonZone.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.flpButtonZone.Controls.Add(this.btnTest1);
+            this.flpButtonZone.Controls.Add(this.btnTest2);
             this.flpButtonZone.Dock = System.Windows.Forms.DockStyle.Top;
             this.flpButtonZone.Location = new System.Drawing.Point(0, 0);
             this.flpButtonZone.Name = "flpButtonZone";
@@ -64,6 +66,17 @@ namespace WinFormWebView2
             this.btnTest1.Text = "TEST1";
             this.btnTest1.UseVisualStyleBackColor = true;
             this.btnTest1.Click += new System.EventHandler(this.btnTest1_Click);
+            // 
+            // btnTest2
+            // 
+            this.btnTest2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnTest2.Location = new System.Drawing.Point(84, 3);
+            this.btnTest2.Name = "btnTest2";
+            this.btnTest2.Size = new System.Drawing.Size(75, 23);
+            this.btnTest2.TabIndex = 1;
+            this.btnTest2.Text = "TEST2";
+            this.btnTest2.UseVisualStyleBackColor = true;
+            this.btnTest2.Click += new System.EventHandler(this.btnTest2_Click);
             // 
             // MainForm
             // 
@@ -84,5 +97,6 @@ namespace WinFormWebView2
         private System.Windows.Forms.Panel pnlForm;
         private System.Windows.Forms.FlowLayoutPanel flpButtonZone;
         private System.Windows.Forms.Button btnTest1;
+        private System.Windows.Forms.Button btnTest2;
     }
 }

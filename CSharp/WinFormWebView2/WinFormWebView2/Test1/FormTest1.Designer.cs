@@ -1,5 +1,5 @@
 ﻿
-namespace WinFormWebView2
+namespace WinFormWebView2.Test1
 {
     partial class FormTest1
     {

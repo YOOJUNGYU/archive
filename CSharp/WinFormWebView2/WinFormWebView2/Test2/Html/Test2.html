@@ -1,0 +1,37 @@
+﻿<!DOCTYPE html>
+<html oncontextmenu="return false">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title></title>
+    <style>
+        body {
+            background-color: aqua;
+        }
+    </style>
+</head>
+<body>
+<button id="button1" onclick="button1_click();">버튼1</button>
+<script>
+    async function button1_click() {
+        // Find added objects on the hostObjects property
+        const bridge = window.chrome.webview.hostObjects.bridge;
+
+// Call a method and pass in a parameter.
+// The result is another proxy promise so you must await to get the result.
+        console.log(await bridge.Func("testing..."));
+
+// A property may be another object as long as its class also implements
+// IDispatch.
+// Getting a property also gets a proxy promise you must await.
+        const propValue = await bridge.AnotherObject.Prop;
+        console.log(propValue);
+
+// Indexed properties
+        let index = 123;
+        bridge[index] = "test";
+        let result = await bridge[index];
+        console.log(result);
+    }
+</script>
+</body>
+</html>

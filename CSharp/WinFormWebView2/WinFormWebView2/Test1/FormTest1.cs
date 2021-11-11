@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace WinFormWebView2
+namespace WinFormWebView2.Test1
 {
     public partial class FormTest1 : Form
     {

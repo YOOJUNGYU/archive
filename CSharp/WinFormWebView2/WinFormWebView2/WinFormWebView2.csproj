@@ -57,11 +57,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FormTest1.cs">
+    <Compile Include="Test1\FormTest1.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FormTest1.Designer.cs">
+    <Compile Include="Test1\FormTest1.Designer.cs">
       <DependentUpon>FormTest1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Test2\Bridge.cs" />
+    <Compile Include="Test2\FormTest2.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Test2\FormTest2.Designer.cs">
+      <DependentUpon>FormTest2.cs</DependentUpon>
     </Compile>
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
@@ -71,8 +78,11 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="FormTest1.resx">
+    <EmbeddedResource Include="Test1\FormTest1.resx">
       <DependentUpon>FormTest1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Test2\FormTest2.resx">
+      <DependentUpon>FormTest2.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
@@ -99,6 +109,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Test2\Html\Test2.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Microsoft.Web.WebView2.1.0.1020.30\build\Microsoft.Web.WebView2.targets" Condition="Exists('..\packages\Microsoft.Web.WebView2.1.0.1020.30\build\Microsoft.Web.WebView2.targets')" />
