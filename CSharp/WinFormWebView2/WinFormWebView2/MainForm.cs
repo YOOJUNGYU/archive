@@ -32,5 +32,10 @@ namespace WinFormWebView2
 
         private void btnTest2_Click(object sender, EventArgs e)
             => LoadForm(_formTest2);
+
+        private void btnTest3_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

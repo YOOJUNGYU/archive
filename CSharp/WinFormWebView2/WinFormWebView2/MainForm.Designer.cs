@@ -33,6 +33,7 @@ namespace WinFormWebView2
             this.flpButtonZone = new System.Windows.Forms.FlowLayoutPanel();
             this.btnTest1 = new System.Windows.Forms.Button();
             this.btnTest2 = new System.Windows.Forms.Button();
+            this.btnTest3 = new System.Windows.Forms.Button();
             this.flpButtonZone.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -50,6 +51,7 @@ namespace WinFormWebView2
             this.flpButtonZone.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.flpButtonZone.Controls.Add(this.btnTest1);
             this.flpButtonZone.Controls.Add(this.btnTest2);
+            this.flpButtonZone.Controls.Add(this.btnTest3);
             this.flpButtonZone.Dock = System.Windows.Forms.DockStyle.Top;
             this.flpButtonZone.Location = new System.Drawing.Point(0, 0);
             this.flpButtonZone.Name = "flpButtonZone";
@@ -78,6 +80,17 @@ namespace WinFormWebView2
             this.btnTest2.UseVisualStyleBackColor = true;
             this.btnTest2.Click += new System.EventHandler(this.btnTest2_Click);
             // 
+            // btnTest3
+            // 
+            this.btnTest3.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnTest3.Location = new System.Drawing.Point(165, 3);
+            this.btnTest3.Name = "btnTest3";
+            this.btnTest3.Size = new System.Drawing.Size(75, 23);
+            this.btnTest3.TabIndex = 2;
+            this.btnTest3.Text = "TEST3";
+            this.btnTest3.UseVisualStyleBackColor = true;
+            this.btnTest3.Click += new System.EventHandler(this.btnTest3_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
@@ -98,5 +111,6 @@ namespace WinFormWebView2
         private System.Windows.Forms.FlowLayoutPanel flpButtonZone;
         private System.Windows.Forms.Button btnTest1;
         private System.Windows.Forms.Button btnTest2;
+        private System.Windows.Forms.Button btnTest3;
     }
 }
