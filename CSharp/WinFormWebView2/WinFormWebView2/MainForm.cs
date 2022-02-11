@@ -2,6 +2,7 @@
 using System.Windows.Forms;
 using WinFormWebView2.Test1;
 using WinFormWebView2.Test2;
+using WinFormWebView2.Test3;
 
 namespace WinFormWebView2
 {
@@ -9,6 +10,7 @@ namespace WinFormWebView2
     {
         private readonly FormTest1 _formTest1 = new FormTest1();
         private readonly FormTest2 _formTest2 = new FormTest2();
+        private readonly FormTest3 _formTest3 = new FormTest3();
 
         public MainForm()
         {
@@ -34,8 +36,6 @@ namespace WinFormWebView2
             => LoadForm(_formTest2);
 
         private void btnTest3_Click(object sender, EventArgs e)
-        {
-
-        }
+            => LoadForm(_formTest3);
     }
 }
