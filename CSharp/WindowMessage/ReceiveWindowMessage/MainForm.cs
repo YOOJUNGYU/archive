@@ -25,10 +25,15 @@ namespace ReceiveWindowMessage
             switch (wMessage.Msg)
             {
                 case WM_USER:
-                    var sb = new StringBuilder();
-                    GlobalGetAtomName(wMessage.LParam.ToInt32(), sb, 1024);
+                    var wParamStringBuilder = new StringBuilder();
+                    GlobalGetAtomName(wMessage.WParam.ToInt32(), wParamStringBuilder, 1024);
+                    GlobalDeleteAtom(wMessage.WParam.ToInt32());
+
+                    var lParamStringBuilder = new StringBuilder();
+                    GlobalGetAtomName(wMessage.LParam.ToInt32(), lParamStringBuilder, 1024);
                     GlobalDeleteAtom(wMessage.LParam.ToInt32());
-                    txtReceiveMessage.Text += $"[{DateTime.Now}]{sb} \r\n";
+
+                    txtReceiveMessage.Text += $"[{DateTime.Now}]\r\n[WParam]: {wParamStringBuilder} \r\n[LParam]: {lParamStringBuilder} \r\n============\r\n\r\n";
                     break;
             }
             base.WndProc(ref wMessage);

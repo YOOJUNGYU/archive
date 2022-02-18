@@ -28,7 +28,7 @@ namespace SendWindowMessage
                 var processes = Process.GetProcessesByName("ReceiveWindowMessage");
                 if (processes.Length > 0)
                 {
-                    SendMessage(processes[0].MainWindowHandle, WM_USER, 0, GlobalAddAtom(txtSendMessage.Text));
+                    SendMessage(processes[0].MainWindowHandle, WM_USER, GlobalAddAtom(txtWParam.Text), GlobalAddAtom(txtLParam.Text));
                 }
             }
             catch (Exception ex)

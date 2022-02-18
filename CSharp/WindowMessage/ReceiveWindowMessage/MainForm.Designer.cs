@@ -40,14 +40,15 @@ namespace ReceiveWindowMessage
             this.txtReceiveMessage.Location = new System.Drawing.Point(12, 12);
             this.txtReceiveMessage.Multiline = true;
             this.txtReceiveMessage.Name = "txtReceiveMessage";
-            this.txtReceiveMessage.Size = new System.Drawing.Size(287, 182);
+            this.txtReceiveMessage.ReadOnly = true;
+            this.txtReceiveMessage.Size = new System.Drawing.Size(462, 182);
             this.txtReceiveMessage.TabIndex = 0;
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(311, 206);
+            this.ClientSize = new System.Drawing.Size(486, 206);
             this.Controls.Add(this.txtReceiveMessage);
             this.Name = "MainForm";
             this.Text = "ReceiveWindowMessage";

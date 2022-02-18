@@ -29,26 +29,26 @@ namespace SendWindowMessage
         /// </summary>
         private void InitializeComponent()
         {
-            this.txtSendMessage = new System.Windows.Forms.TextBox();
+            this.txtWParam = new System.Windows.Forms.TextBox();
             this.btnSendMessage = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
+            this.txtLParam = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
-            // txtSendMessage
+            // txtWParam
             // 
-            this.txtSendMessage.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtSendMessage.Location = new System.Drawing.Point(12, 24);
-            this.txtSendMessage.Name = "txtSendMessage";
-            this.txtSendMessage.Size = new System.Drawing.Size(173, 21);
-            this.txtSendMessage.TabIndex = 0;
+            this.txtWParam.Location = new System.Drawing.Point(76, 8);
+            this.txtWParam.Multiline = true;
+            this.txtWParam.Name = "txtWParam";
+            this.txtWParam.Size = new System.Drawing.Size(252, 79);
+            this.txtWParam.TabIndex = 0;
             // 
             // btnSendMessage
             // 
-            this.btnSendMessage.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSendMessage.Location = new System.Drawing.Point(185, 23);
+            this.btnSendMessage.Location = new System.Drawing.Point(334, 137);
             this.btnSendMessage.Name = "btnSendMessage";
-            this.btnSendMessage.Size = new System.Drawing.Size(75, 23);
+            this.btnSendMessage.Size = new System.Drawing.Size(75, 44);
             this.btnSendMessage.TabIndex = 1;
             this.btnSendMessage.Text = "전송";
             this.btnSendMessage.UseVisualStyleBackColor = true;
@@ -57,20 +57,40 @@ namespace SendWindowMessage
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(15, 9);
+            this.label1.Location = new System.Drawing.Point(16, 11);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(66, 12);
+            this.label1.Size = new System.Drawing.Size(52, 12);
             this.label1.TabIndex = 2;
-            this.label1.Text = "WM 보내기";
+            this.label1.Text = "WParam";
+            // 
+            // txtLParam
+            // 
+            this.txtLParam.Location = new System.Drawing.Point(76, 93);
+            this.txtLParam.Multiline = true;
+            this.txtLParam.Name = "txtLParam";
+            this.txtLParam.Size = new System.Drawing.Size(252, 88);
+            this.txtLParam.TabIndex = 3;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(16, 96);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(49, 12);
+            this.label2.TabIndex = 4;
+            this.label2.Text = "LParam";
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(273, 60);
+            this.ClientSize = new System.Drawing.Size(427, 189);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.txtLParam);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.btnSendMessage);
-            this.Controls.Add(this.txtSendMessage);
+            this.Controls.Add(this.txtWParam);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "MainForm";
             this.Text = "SendWindowMessage";
             this.ResumeLayout(false);
@@ -80,9 +100,11 @@ namespace SendWindowMessage
 
         #endregion
 
-        private System.Windows.Forms.TextBox txtSendMessage;
+        private System.Windows.Forms.TextBox txtWParam;
         private System.Windows.Forms.Button btnSendMessage;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TextBox txtLParam;
+        private System.Windows.Forms.Label label2;
     }
 }
 
