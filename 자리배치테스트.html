@@ -1,0 +1,1440 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>책상 자리배치 테스트</title>
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --panel: #ffffff;
+      --line: #d6dde5;
+      --line-strong: #aeb9c5;
+      --text: #18212b;
+      --muted: #687685;
+      --accent: #1463ff;
+      --accent-dark: #0f4fd0;
+      --danger: #c62828;
+      --desk: #f2b35d;
+      --desk-edge: #9a5d17;
+      --column: #c6cbd2;
+      --column-edge: #626d78;
+      --door: #58b982;
+      --door-edge: #1e7046;
+      --selected: #0d6efd;
+      --scale: 1;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background: var(--bg);
+      font-family: Arial, "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+    }
+
+    .app {
+      height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      overflow: hidden;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 18px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--line);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: 0;
+      white-space: nowrap;
+    }
+
+    .summary {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .header-actions button {
+      min-height: 34px;
+      padding: 0 14px;
+      font-size: 13px;
+    }
+
+    .header-actions .help-btn {
+      width: 34px;
+      padding: 0;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(15, 25, 40, .55);
+      z-index: 100;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal {
+      width: min(640px, 100%);
+      max-height: 100%;
+      display: flex;
+      flex-direction: column;
+      background: var(--panel);
+      border-radius: 10px;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, .35);
+      overflow: hidden;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .modal-close {
+      min-height: 32px;
+      padding: 0 12px;
+      font-size: 13px;
+    }
+
+    .modal-body {
+      padding: 16px 20px 20px;
+      overflow-y: auto;
+      font-size: 13.5px;
+      line-height: 1.6;
+      color: #2c3745;
+    }
+
+    .modal-body h3 {
+      margin: 18px 0 6px;
+      font-size: 14px;
+      color: #18212b;
+    }
+
+    .modal-body h3:first-child {
+      margin-top: 0;
+    }
+
+    .modal-body ul {
+      margin: 0 0 4px;
+      padding-left: 20px;
+    }
+
+    .modal-body li {
+      margin: 3px 0;
+    }
+
+    .modal-body kbd {
+      display: inline-block;
+      padding: 1px 6px;
+      border: 1px solid var(--line-strong);
+      border-bottom-width: 2px;
+      border-radius: 4px;
+      background: #f3f6fa;
+      font: 12px/1 Consolas, "Courier New", monospace;
+      color: #18212b;
+    }
+
+    .field.name-field {
+      grid-template-columns: 86px 1fr;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      height: 34px;
+      padding: 0 8px;
+      border: 1px solid var(--line-strong);
+      border-radius: 6px;
+      font: inherit;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      min-height: 0;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    aside {
+      padding: 16px;
+      background: var(--panel);
+      border-right: 1px solid var(--line);
+      overflow-y: auto;
+      overflow-x: hidden;
+      min-height: 0;
+      height: 100%;
+    }
+
+    .section {
+      padding-bottom: 18px;
+      margin-bottom: 18px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .section:last-child {
+      border-bottom: 0;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .section-title {
+      margin: 0 0 10px;
+      color: #2c3745;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    button {
+      min-height: 38px;
+      border: 1px solid var(--line-strong);
+      border-radius: 6px;
+      background: #fff;
+      color: var(--text);
+      font: inherit;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      border-color: #768697;
+      background: #f7f9fb;
+    }
+
+    button.primary {
+      color: #fff;
+      border-color: var(--accent);
+      background: var(--accent);
+    }
+
+    button.primary:hover {
+      border-color: var(--accent-dark);
+      background: var(--accent-dark);
+    }
+
+    button.danger {
+      color: #fff;
+      border-color: var(--danger);
+      background: var(--danger);
+    }
+
+    button.full {
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    button:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+    }
+
+    .field {
+      display: grid;
+      grid-template-columns: 86px 1fr;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+      font-size: 13px;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      height: 34px;
+      padding: 0 8px;
+      border: 1px solid var(--line-strong);
+      border-radius: 6px;
+      font: inherit;
+    }
+
+    input[type="range"] {
+      width: 100%;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 122px;
+      margin-top: 10px;
+      padding: 9px;
+      border: 1px solid var(--line-strong);
+      border-radius: 6px;
+      font: 12px/1.45 Consolas, "Courier New", monospace;
+      resize: vertical;
+    }
+
+    .readout {
+      display: grid;
+      gap: 7px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f8fafc;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .readout strong {
+      font-weight: 700;
+    }
+
+    .hint {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .status {
+      min-height: 18px;
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .workspace {
+      min-width: 0;
+      min-height: 0;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      overflow: hidden;
+    }
+
+    .ruler {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 9px 14px;
+      color: var(--muted);
+      background: #fbfcfd;
+      border-bottom: 1px solid var(--line);
+      font-size: 12px;
+    }
+
+    .viewport {
+      position: relative;
+      overflow: auto;
+      padding: 28px;
+      background:
+        linear-gradient(45deg, #eef2f6 25%, transparent 25%),
+        linear-gradient(-45deg, #eef2f6 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #eef2f6 75%),
+        linear-gradient(-45deg, transparent 75%, #eef2f6 75%);
+      background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+      background-size: 20px 20px;
+    }
+
+    .room-shell {
+      position: relative;
+    }
+
+    #room {
+      position: absolute;
+      left: 0;
+      top: 0;
+      transform: scale(var(--scale));
+      transform-origin: top left;
+      border: 2px solid #27384a;
+      background-color: #fff;
+      background-image:
+        linear-gradient(to right, rgba(30, 55, 80, .12) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(30, 55, 80, .12) 1px, transparent 1px),
+        linear-gradient(to right, rgba(30, 55, 80, .24) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(30, 55, 80, .24) 1px, transparent 1px);
+      background-size: 20px 20px, 20px 20px, 100px 100px, 100px 100px;
+      box-shadow: 0 12px 28px rgba(24, 33, 43, .12);
+      user-select: none;
+    }
+
+    .axis-label {
+      position: absolute;
+      padding: 3px 6px;
+      color: #304050;
+      background: rgba(255, 255, 255, .86);
+      border: 1px solid rgba(174, 185, 197, .8);
+      border-radius: 4px;
+      font-size: 12px;
+      pointer-events: none;
+    }
+
+    .axis-label.width {
+      left: 50%;
+      bottom: 8px;
+      transform: translateX(-50%);
+    }
+
+    .axis-label.height {
+      top: 50%;
+      right: 8px;
+      transform: translateY(-50%) rotate(-90deg);
+      transform-origin: center;
+    }
+
+    .item {
+      position: absolute;
+      display: grid;
+      place-items: center;
+      border: 2px solid transparent;
+      border-radius: 6px;
+      color: #18212b;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: grab;
+      touch-action: none;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.28), 0 3px 9px rgba(0,0,0,.16);
+    }
+
+    .item::before {
+      content: "";
+      position: absolute;
+      inset: 8px;
+      border: 1px dashed rgba(20, 30, 40, .25);
+      border-radius: 4px;
+      pointer-events: none;
+    }
+
+    .item.desk {
+      border-color: var(--desk-edge);
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.18), transparent 22%, transparent 78%, rgba(0,0,0,.08)),
+        var(--desk);
+      color: #3d260b;
+    }
+
+    .item.column {
+      border-color: var(--column-edge);
+      border-radius: 3px;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.3), transparent 35%, rgba(0,0,0,.1)),
+        var(--column);
+      color: #26313d;
+    }
+
+    .item.door {
+      border-color: var(--door-edge);
+      border-radius: 3px;
+      background:
+        repeating-linear-gradient(90deg, rgba(255,255,255,.24) 0, rgba(255,255,255,.24) 7px, transparent 7px, transparent 14px),
+        var(--door);
+      color: #0f3524;
+    }
+
+    .item.selected {
+      border-color: var(--selected);
+      box-shadow:
+        0 0 0 3px rgba(13, 110, 253, .24),
+        inset 0 0 0 1px rgba(255,255,255,.28),
+        0 5px 12px rgba(0,0,0,.18);
+    }
+
+    .item.dragging {
+      cursor: grabbing;
+      opacity: .88;
+    }
+
+    .item .label {
+      position: relative;
+      z-index: 1;
+      padding: 2px 6px;
+      max-width: calc(100% - 8px);
+      overflow: hidden;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, .72);
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      cursor: text;
+    }
+
+    .item .label:hover {
+      background: rgba(255, 255, 255, .92);
+      outline: 1px dashed rgba(20, 30, 40, .35);
+    }
+
+    .item .label.editing {
+      cursor: text;
+      background: #fff;
+      outline: 2px solid var(--accent);
+      white-space: nowrap;
+      overflow: visible;
+      min-width: 40px;
+    }
+
+    @media (max-width: 880px) {
+      header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      main {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+      }
+
+      aside {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .controls {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 600px) {
+      .controls {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .summary,
+      .ruler {
+        flex-wrap: wrap;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>책상 자리배치 테스트</h1>
+      <div class="summary">
+        <span id="roomSize">공간 1680cm x 480cm</span>
+        <span id="deskSize">책상 160cm x 80cm</span>
+        <span id="objectCount">책상 0개, 기둥 0개, 문 0개</span>
+      </div>
+      <div class="header-actions">
+        <button id="helpButton" class="help-btn" type="button" title="사용 방법" aria-label="사용 방법">?</button>
+        <button id="exportFile" type="button">Export</button>
+        <button id="importFile" type="button">Import</button>
+        <input id="importFileInput" type="file" accept="application/json,.json" hidden>
+      </div>
+    </header>
+
+    <div class="modal-backdrop" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+      <div class="modal">
+        <div class="modal-header">
+          <h2 id="helpTitle">사용 방법</h2>
+          <button class="modal-close" id="helpClose" type="button">닫기</button>
+        </div>
+        <div class="modal-body">
+          <h3>공간 설정</h3>
+          <ul>
+            <li>좌측 <strong>공간 크기</strong>에서 가로/세로(cm)를 입력하고 <strong>공간 적용</strong>을 누르면 방 크기가 바뀝니다.</li>
+            <li>우측 상단의 확대 슬라이더로 화면 배율을 조절할 수 있습니다.</li>
+          </ul>
+
+          <h3>책상 · 기둥 · 문 배치</h3>
+          <ul>
+            <li>좌측 패널의 크기 입력 후 <strong>추가</strong>(책상), <strong>기둥 추가</strong>, <strong>문 추가</strong> 버튼으로 항목을 만들 수 있습니다.</li>
+            <li>공간 안의 항목을 <strong>드래그</strong>하면 위치를 옮길 수 있습니다. 10cm 단위로 스냅됩니다.</li>
+            <li>항목을 클릭해 선택한 뒤 좌측의 <strong>X / Y / 가로 / 세로</strong> 입력으로 정확한 값을 지정할 수 있습니다.</li>
+            <li>선택 항목은 <strong>90도 회전</strong>, <strong>복제</strong>, <strong>삭제</strong> 버튼으로 다룰 수 있습니다.</li>
+          </ul>
+
+          <h3>이름 입력</h3>
+          <ul>
+            <li>책상/기둥/문 위의 <strong>이름 라벨을 클릭</strong>하면 그 자리에서 바로 이름을 입력할 수 있습니다.</li>
+            <li><kbd>Enter</kbd> 또는 바깥쪽 클릭으로 저장, <kbd>Esc</kbd>로 취소합니다.</li>
+          </ul>
+
+          <h3>저장 / 불러오기</h3>
+          <ul>
+            <li>모든 변경 사항은 <strong>자동으로 브라우저에 저장</strong>되며, 다시 열어도 마지막 상태가 유지됩니다.</li>
+            <li>우측 상단 <strong>Export</strong>는 현재 배치를 JSON 파일로 내려받습니다.</li>
+            <li><strong>Import</strong>는 JSON 파일을 불러와 현재 배치를 덮어씁니다.</li>
+          </ul>
+
+          <h3>키보드 단축키</h3>
+          <ul>
+            <li><kbd>Delete</kbd> — 선택한 항목 삭제</li>
+            <li><kbd>R</kbd> — 선택한 항목 90도 회전</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <main>
+      <aside>
+        <section class="section">
+          <p class="section-title">공간 크기</p>
+          <label class="field">
+            <span>가로(cm)</span>
+            <input id="roomWidth" type="number" min="100" max="10000" step="10" value="1680">
+          </label>
+          <label class="field">
+            <span>세로(cm)</span>
+            <input id="roomHeight" type="number" min="100" max="10000" step="10" value="480">
+          </label>
+          <button class="full" id="applyRoomSize" type="button">공간 적용</button>
+        </section>
+
+        <section class="section">
+          <p class="section-title">책상</p>
+          <label class="field">
+            <span>가로(cm)</span>
+            <input id="deskWidth" type="number" min="10" max="10000" step="10" value="160">
+          </label>
+          <label class="field">
+            <span>세로(cm)</span>
+            <input id="deskHeight" type="number" min="10" max="10000" step="10" value="80">
+          </label>
+          <div class="controls">
+            <button class="primary" id="addDesk" type="button">추가</button>
+            <button id="rotateItem" type="button" disabled>90도 회전</button>
+            <button id="duplicateItem" type="button" disabled>복제</button>
+            <button class="danger" id="deleteItem" type="button" disabled>삭제</button>
+          </div>
+        </section>
+
+        <section class="section">
+          <p class="section-title">기둥 추가</p>
+          <label class="field">
+            <span>가로(cm)</span>
+            <input id="columnWidth" type="number" min="10" max="10000" step="10" value="120">
+          </label>
+          <label class="field">
+            <span>세로(cm)</span>
+            <input id="columnHeight" type="number" min="10" max="10000" step="10" value="120">
+          </label>
+          <button class="full" id="addColumn" type="button">기둥 추가</button>
+        </section>
+
+        <section class="section">
+          <p class="section-title">문 추가</p>
+          <label class="field">
+            <span>가로(cm)</span>
+            <input id="doorWidth" type="number" min="10" max="10000" step="10" value="120">
+          </label>
+          <label class="field">
+            <span>세로(cm)</span>
+            <input id="doorHeight" type="number" min="10" max="10000" step="10" value="20">
+          </label>
+          <button class="full" id="addDoor" type="button">문 추가</button>
+        </section>
+
+        <section class="section">
+          <p class="section-title">선택 항목</p>
+          <div class="readout" id="selectedInfo">
+            <span>선택된 항목이 없습니다.</span>
+          </div>
+          <label class="field">
+            <span>X(cm)</span>
+            <input id="itemX" type="number" min="0" step="10" disabled>
+          </label>
+          <label class="field">
+            <span>Y(cm)</span>
+            <input id="itemY" type="number" min="0" step="10" disabled>
+          </label>
+          <label class="field">
+            <span>가로(cm)</span>
+            <input id="itemWidth" type="number" min="10" step="10" disabled>
+          </label>
+          <label class="field">
+            <span>세로(cm)</span>
+            <input id="itemHeight" type="number" min="10" step="10" disabled>
+          </label>
+        </section>
+
+        <section class="section">
+          <p class="section-title">보기</p>
+          <label class="field">
+            <span>확대</span>
+            <input id="zoom" type="range" min="40" max="120" value="80" step="5">
+          </label>
+          <div class="hint" id="zoomText">80%</div>
+        </section>
+
+        <div class="status" id="storageStatus"></div>
+      </aside>
+
+      <section class="workspace">
+        <div class="ruler">
+          <span id="xRange">X 0-1680cm</span>
+          <span id="yRange">Y 0-480cm</span>
+        </div>
+        <div class="viewport" id="viewport">
+          <div class="room-shell" id="roomShell">
+            <div id="room" aria-label="1680cm by 480cm room">
+              <span class="axis-label width" id="roomWidthLabel">1680cm</span>
+              <span class="axis-label height" id="roomHeightLabel">480cm</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "desk-layout-tester-state-v1";
+    const DEFAULT_DESK = { width: 160, height: 80 };
+    const DEFAULT_COLUMN = { width: 120, height: 120 };
+    const DEFAULT_DOOR = { width: 120, height: 20 };
+    const GRID = 10;
+    const TYPE_LABELS = {
+      desk: "책상",
+      column: "기둥",
+      door: "문"
+    };
+
+    const DEFAULT_LAYOUT = {
+      version: 1,
+      unit: "cm",
+      room: { width: 1680, height: 480 },
+      defaults: {
+        desk: { width: 160, height: 80 },
+        column: { width: 120, height: 120 },
+        door: { width: 120, height: 20 }
+      },
+      zoomPercent: 100,
+      nextId: 30,
+      items: [
+        { id: 2, type: "column", name: "기둥1", x: 360, y: 0, width: 120, height: 120, rotation: 0 },
+        { id: 3, type: "column", name: "기둥2", x: 1180, y: 0, width: 120, height: 120, rotation: 0 },
+        { id: 4, type: "door", name: "문 2", x: 1310, y: 0, width: 120, height: 20, rotation: 0 },
+        { id: 5, type: "door", name: "문 1", x: 520, y: 0, width: 120, height: 20, rotation: 0 }
+      ]
+    };
+
+    const state = {
+      room: { width: 1680, height: 480 },
+      items: [],
+      selectedId: null,
+      nextId: 1,
+      zoom: 0.8,
+      drag: null
+    };
+
+    const room = document.getElementById("room");
+    const roomShell = document.getElementById("roomShell");
+    const roomSize = document.getElementById("roomSize");
+    const deskSize = document.getElementById("deskSize");
+    const objectCount = document.getElementById("objectCount");
+    const roomWidthInput = document.getElementById("roomWidth");
+    const roomHeightInput = document.getElementById("roomHeight");
+    const applyRoomSizeButton = document.getElementById("applyRoomSize");
+    const roomWidthLabel = document.getElementById("roomWidthLabel");
+    const roomHeightLabel = document.getElementById("roomHeightLabel");
+    const xRange = document.getElementById("xRange");
+    const yRange = document.getElementById("yRange");
+
+    const addDeskButton = document.getElementById("addDesk");
+    const addColumnButton = document.getElementById("addColumn");
+    const addDoorButton = document.getElementById("addDoor");
+    const rotateItemButton = document.getElementById("rotateItem");
+    const duplicateItemButton = document.getElementById("duplicateItem");
+    const deleteItemButton = document.getElementById("deleteItem");
+
+    const deskWidthInput = document.getElementById("deskWidth");
+    const deskHeightInput = document.getElementById("deskHeight");
+    const columnWidthInput = document.getElementById("columnWidth");
+    const columnHeightInput = document.getElementById("columnHeight");
+    const doorWidthInput = document.getElementById("doorWidth");
+    const doorHeightInput = document.getElementById("doorHeight");
+    const selectedInfo = document.getElementById("selectedInfo");
+    const itemXInput = document.getElementById("itemX");
+    const itemYInput = document.getElementById("itemY");
+    const itemWidthInput = document.getElementById("itemWidth");
+    const itemHeightInput = document.getElementById("itemHeight");
+    const exportFileButton = document.getElementById("exportFile");
+    const importFileButton = document.getElementById("importFile");
+    const importFileInput = document.getElementById("importFileInput");
+    const helpButton = document.getElementById("helpButton");
+    const helpModal = document.getElementById("helpModal");
+    const helpClose = document.getElementById("helpClose");
+    const zoomInput = document.getElementById("zoom");
+    const zoomText = document.getElementById("zoomText");
+    const storageStatus = document.getElementById("storageStatus");
+
+    function snap(value) {
+      return Math.round(value / GRID) * GRID;
+    }
+
+    function normalizeNumber(value, fallback, min = 1, max = 10000) {
+      const number = Math.round(Number(value));
+      if (!Number.isFinite(number)) return fallback;
+      return Math.max(min, Math.min(number, max));
+    }
+
+    function positiveNumber(input, fallback, min = 1, max = 10000) {
+      return normalizeNumber(input.value, fallback, min, max);
+    }
+
+    function selectedItem() {
+      return state.items.find((item) => item.id === state.selectedId) || null;
+    }
+
+    function footprint(item) {
+      return item.rotation % 180 === 0
+        ? { width: item.width, height: item.height }
+        : { width: item.height, height: item.width };
+    }
+
+    function clampItem(item) {
+      const size = footprint(item);
+      const maxX = Math.max(0, state.room.width - size.width);
+      const maxY = Math.max(0, state.room.height - size.height);
+      item.x = Math.max(0, Math.min(snap(item.x), maxX));
+      item.y = Math.max(0, Math.min(snap(item.y), maxY));
+    }
+
+    function clampAllItems() {
+      state.items.forEach(clampItem);
+    }
+
+    function boundsFor(item, x = item.x, y = item.y) {
+      const size = footprint(item);
+      return { x, y, width: size.width, height: size.height };
+    }
+
+    function intersects(a, b) {
+      return a.x < b.x + b.width &&
+        a.x + a.width > b.x &&
+        a.y < b.y + b.height &&
+        a.y + a.height > b.y;
+    }
+
+    function findOpenPosition(item) {
+      const size = footprint(item);
+      const maxX = Math.max(0, state.room.width - size.width);
+      const maxY = Math.max(0, state.room.height - size.height);
+      for (let y = 20; y <= maxY; y += GRID) {
+        for (let x = 20; x <= maxX; x += GRID) {
+          const candidate = { x, y, width: size.width, height: size.height };
+          const overlaps = state.items.some((placed) => intersects(candidate, boundsFor(placed)));
+          if (!overlaps) return { x, y };
+        }
+      }
+      return { x: 0, y: 0 };
+    }
+
+    function readCustomSize(widthInput, heightInput, fallback = { width: 10, height: 10 }) {
+      return {
+        width: positiveNumber(widthInput, fallback.width, 10, state.room.width),
+        height: positiveNumber(heightInput, fallback.height, 10, state.room.height)
+      };
+    }
+
+    function readDeskSize() {
+      return {
+        width: positiveNumber(deskWidthInput, DEFAULT_DESK.width, 10, state.room.width),
+        height: positiveNumber(deskHeightInput, DEFAULT_DESK.height, 10, state.room.height)
+      };
+    }
+
+    function syncDeskSize() {
+      const size = readDeskSize();
+      deskWidthInput.value = size.width;
+      deskHeightInput.value = size.height;
+      deskSize.textContent = `책상 ${size.width}cm x ${size.height}cm`;
+    }
+
+    function readDefaultSizes() {
+      return {
+        desk: readDeskSize(),
+        column: readCustomSize(columnWidthInput, columnHeightInput, DEFAULT_COLUMN),
+        door: readCustomSize(doorWidthInput, doorHeightInput, DEFAULT_DOOR)
+      };
+    }
+
+    function syncDefaultSizes() {
+      const defaults = readDefaultSizes();
+      deskWidthInput.value = defaults.desk.width;
+      deskHeightInput.value = defaults.desk.height;
+      deskSize.textContent = `책상 ${defaults.desk.width}cm x ${defaults.desk.height}cm`;
+      columnWidthInput.value = defaults.column.width;
+      columnHeightInput.value = defaults.column.height;
+      doorWidthInput.value = defaults.door.width;
+      doorHeightInput.value = defaults.door.height;
+    }
+
+    function setStorageStatus(message) {
+      storageStatus.textContent = message;
+    }
+
+    function escapeHtml(text) {
+      return String(text).replace(/[&<>"']/g, (ch) => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;"
+      })[ch]);
+    }
+
+    let autoSaveSuspended = false;
+    let autoSaveTimer = null;
+    function autoSave() {
+      if (autoSaveSuspended) return;
+      clearTimeout(autoSaveTimer);
+      autoSaveTimer = setTimeout(() => {
+        try {
+          localStorage.setItem(STORAGE_KEY, layoutJson());
+          setStorageStatus("자동 저장됨 · " + new Date().toLocaleTimeString());
+        } catch (error) {
+          setStorageStatus("자동 저장 실패: " + error.message);
+        }
+      }, 150);
+    }
+
+    function currentLayoutData() {
+      const defaults = readDefaultSizes();
+      const maxId = state.items.reduce((max, item) => Math.max(max, item.id), 0);
+      return {
+        version: 1,
+        unit: "cm",
+        room: { ...state.room },
+        defaults,
+        zoomPercent: Math.round(state.zoom * 100),
+        nextId: Math.max(state.nextId, maxId + 1),
+        items: state.items.map((item) => ({
+          id: item.id,
+          type: item.type,
+          name: item.name || "",
+          x: item.x,
+          y: item.y,
+          width: item.width,
+          height: item.height,
+          rotation: item.rotation
+        }))
+      };
+    }
+
+    function layoutJson() {
+      syncDefaultSizes();
+      return JSON.stringify(currentLayoutData(), null, 2);
+    }
+
+    function normalizeSize(data, fallback, roomLimit) {
+      return {
+        width: normalizeNumber(data?.width, fallback.width, 10, roomLimit.width),
+        height: normalizeNumber(data?.height, fallback.height, 10, roomLimit.height)
+      };
+    }
+
+    function normalizeRotation(value) {
+      const rotation = normalizeNumber(value, 0, -3600, 3600);
+      return ((Math.round(rotation / 90) * 90) % 360 + 360) % 360;
+    }
+
+    function normalizeLayoutData(data) {
+      if (!data || typeof data !== "object") {
+        throw new Error("JSON 최상위 값은 객체여야 합니다.");
+      }
+
+      const roomData = data.room || {};
+      const normalizedRoom = {
+        width: normalizeNumber(roomData.width, 1680, 100, 10000),
+        height: normalizeNumber(roomData.height, 480, 100, 10000)
+      };
+      const defaultsData = data.defaults || {};
+      const normalizedDefaults = {
+        desk: normalizeSize(defaultsData.desk, DEFAULT_DESK, normalizedRoom),
+        column: normalizeSize(defaultsData.column, DEFAULT_COLUMN, normalizedRoom),
+        door: normalizeSize(defaultsData.door, DEFAULT_DOOR, normalizedRoom)
+      };
+
+      const usedIds = new Set();
+      let nextAutoId = 1;
+      const items = Array.isArray(data.items) ? data.items : [];
+      const normalizedItems = items
+        .map((item) => {
+          if (!item || !Object.prototype.hasOwnProperty.call(TYPE_LABELS, item.type)) return null;
+          const fallback = normalizedDefaults[item.type];
+          let id = normalizeNumber(item.id, nextAutoId, 1, 999999);
+          while (usedIds.has(id)) id += 1;
+          usedIds.add(id);
+          nextAutoId = Math.max(nextAutoId, id + 1);
+
+          return {
+            id,
+            type: item.type,
+            name: typeof item.name === "string" ? item.name.slice(0, 40) : "",
+            x: normalizeNumber(item.x, 0, 0, normalizedRoom.width),
+            y: normalizeNumber(item.y, 0, 0, normalizedRoom.height),
+            width: normalizeNumber(item.width, fallback.width, 10, normalizedRoom.width),
+            height: normalizeNumber(item.height, fallback.height, 10, normalizedRoom.height),
+            rotation: normalizeRotation(item.rotation)
+          };
+        })
+        .filter(Boolean);
+
+      return {
+        room: normalizedRoom,
+        defaults: normalizedDefaults,
+        zoomPercent: normalizeNumber(data.zoomPercent, Math.round(state.zoom * 100), 40, 120),
+        nextId: Math.max(normalizeNumber(data.nextId, nextAutoId, 1, 999999), nextAutoId),
+        items: normalizedItems
+      };
+    }
+
+    function applyLayoutData(data) {
+      const layout = normalizeLayoutData(data);
+      state.room = layout.room;
+      state.items = layout.items;
+      state.nextId = layout.nextId;
+      state.selectedId = null;
+      state.drag = null;
+
+      roomWidthInput.value = layout.room.width;
+      roomHeightInput.value = layout.room.height;
+      deskWidthInput.value = layout.defaults.desk.width;
+      deskHeightInput.value = layout.defaults.desk.height;
+      columnWidthInput.value = layout.defaults.column.width;
+      columnHeightInput.value = layout.defaults.column.height;
+      doorWidthInput.value = layout.defaults.door.width;
+      doorHeightInput.value = layout.defaults.door.height;
+      zoomInput.value = layout.zoomPercent;
+
+      syncDefaultSizes();
+      setZoom(layout.zoomPercent);
+      clampAllItems();
+      render();
+    }
+
+    function addItem(type, source = null) {
+      const id = state.nextId++;
+      const size = source
+        ? { width: source.width, height: source.height }
+        : type === "desk"
+          ? readDeskSize()
+          : type === "column"
+            ? readCustomSize(columnWidthInput, columnHeightInput, DEFAULT_COLUMN)
+            : readCustomSize(doorWidthInput, doorHeightInput, DEFAULT_DOOR);
+      const item = {
+        id,
+        type,
+        name: source ? (source.name || "") : "",
+        x: source ? source.x + 30 : 0,
+        y: source ? source.y + 30 : 0,
+        width: size.width,
+        height: size.height,
+        rotation: source ? source.rotation : 0
+      };
+
+      if (!source) {
+        const position = findOpenPosition(item);
+        item.x = position.x;
+        item.y = position.y;
+      }
+
+      clampItem(item);
+      state.items.push(item);
+      state.selectedId = id;
+      render();
+    }
+
+    function deleteSelected() {
+      if (!state.selectedId) return;
+      state.items = state.items.filter((item) => item.id !== state.selectedId);
+      state.selectedId = state.items.length ? state.items[state.items.length - 1].id : null;
+      render();
+    }
+
+    function rotateSelected() {
+      const item = selectedItem();
+      if (!item) return;
+      item.rotation = (item.rotation + 90) % 360;
+      clampItem(item);
+      render();
+    }
+
+    function duplicateSelected() {
+      const item = selectedItem();
+      if (!item) return;
+      addItem(item.type, item);
+    }
+
+    function moveSelectedTo(x, y) {
+      const item = selectedItem();
+      if (!item) return;
+      item.x = Number.isFinite(x) ? x : item.x;
+      item.y = Number.isFinite(y) ? y : item.y;
+      clampItem(item);
+      render();
+    }
+
+    function resizeSelected() {
+      const item = selectedItem();
+      if (!item) return;
+      item.width = positiveNumber(itemWidthInput, item.width, 10, state.room.width);
+      item.height = positiveNumber(itemHeightInput, item.height, 10, state.room.height);
+      clampItem(item);
+      render();
+    }
+
+    function syncRoom() {
+      room.style.width = `${state.room.width}px`;
+      room.style.height = `${state.room.height}px`;
+      roomShell.style.width = `${state.room.width * state.zoom}px`;
+      roomShell.style.height = `${state.room.height * state.zoom}px`;
+      room.setAttribute("aria-label", `${state.room.width}cm by ${state.room.height}cm room`);
+      roomSize.textContent = `공간 ${state.room.width}cm x ${state.room.height}cm`;
+      roomWidthLabel.textContent = `${state.room.width}cm`;
+      roomHeightLabel.textContent = `${state.room.height}cm`;
+      xRange.textContent = `X 0-${state.room.width}cm`;
+      yRange.textContent = `Y 0-${state.room.height}cm`;
+    }
+
+    function applyRoomSize() {
+      state.room.width = positiveNumber(roomWidthInput, state.room.width, 100, 10000);
+      state.room.height = positiveNumber(roomHeightInput, state.room.height, 100, 10000);
+      roomWidthInput.value = state.room.width;
+      roomHeightInput.value = state.room.height;
+      syncDefaultSizes();
+      clampAllItems();
+      syncRoom();
+      render();
+      autoSave();
+    }
+
+    function downloadLayoutFile() {
+      const json = layoutJson();
+      const blob = new Blob([json], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      const ts = new Date().toISOString().replace(/[:T]/g, "-").slice(0, 19);
+      a.href = url;
+      a.download = `desk-layout-${ts}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      setStorageStatus("배치를 JSON 파일로 내보냈습니다.");
+    }
+
+    function triggerImportFile() {
+      importFileInput.value = "";
+      importFileInput.click();
+    }
+
+    function handleImportFile(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const data = JSON.parse(String(reader.result || ""));
+          autoSaveSuspended = true;
+          applyLayoutData(data);
+          autoSaveSuspended = false;
+          autoSave();
+          setStorageStatus(`"${file.name}" 파일을 불러왔습니다.`);
+        } catch (error) {
+          autoSaveSuspended = false;
+          setStorageStatus(`파일 불러오기 실패: ${error.message}`);
+        }
+      };
+      reader.onerror = () => {
+        setStorageStatus("파일을 읽지 못했습니다.");
+      };
+      reader.readAsText(file);
+    }
+
+    function setZoom(value) {
+      state.zoom = value / 100;
+      document.documentElement.style.setProperty("--scale", state.zoom);
+      zoomText.textContent = `${value}%`;
+      syncRoom();
+    }
+
+    function syncSelection() {
+      const item = selectedItem();
+      const hasSelection = Boolean(item);
+      room.querySelectorAll(".item").forEach((node) => {
+        node.classList.toggle("selected", Number(node.dataset.id) === state.selectedId);
+      });
+
+      rotateItemButton.disabled = !hasSelection;
+      duplicateItemButton.disabled = !hasSelection;
+      deleteItemButton.disabled = !hasSelection;
+      itemXInput.disabled = !hasSelection;
+      itemYInput.disabled = !hasSelection;
+      itemWidthInput.disabled = !hasSelection;
+      itemHeightInput.disabled = !hasSelection;
+
+      const counts = {
+        desk: state.items.filter((placed) => placed.type === "desk").length,
+        column: state.items.filter((placed) => placed.type === "column").length,
+        door: state.items.filter((placed) => placed.type === "door").length
+      };
+      objectCount.textContent = `책상 ${counts.desk}개, 기둥 ${counts.column}개, 문 ${counts.door}개`;
+
+      if (!item) {
+        selectedInfo.innerHTML = "<span>선택된 항목이 없습니다.</span>";
+        itemXInput.value = "";
+        itemYInput.value = "";
+        itemWidthInput.value = "";
+        itemHeightInput.value = "";
+        return;
+      }
+
+      const size = footprint(item);
+      const heading = item.name && item.name.trim()
+        ? `${escapeHtml(item.name)} (${TYPE_LABELS[item.type]} ${item.id})`
+        : `${TYPE_LABELS[item.type]} ${item.id}`;
+      selectedInfo.innerHTML = `
+        <span><strong>${heading}</strong></span>
+        <span>위치: X ${item.x}cm, Y ${item.y}cm</span>
+        <span>표시 크기: ${size.width}cm x ${size.height}cm</span>
+        <span>회전: ${item.rotation}도</span>
+      `;
+      itemXInput.max = Math.max(0, state.room.width - size.width);
+      itemYInput.max = Math.max(0, state.room.height - size.height);
+      itemWidthInput.max = state.room.width;
+      itemHeightInput.max = state.room.height;
+      itemXInput.value = item.x;
+      itemYInput.value = item.y;
+      itemWidthInput.value = item.width;
+      itemHeightInput.value = item.height;
+    }
+
+    function startInlineNameEdit(labelNode, item) {
+      if (labelNode.classList.contains("editing")) return;
+      const original = item.name || "";
+      labelNode.textContent = original;
+      labelNode.classList.add("editing");
+      labelNode.contentEditable = "true";
+      labelNode.spellcheck = false;
+      labelNode.focus();
+      const range = document.createRange();
+      range.selectNodeContents(labelNode);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+
+      let finished = false;
+      const commit = (save) => {
+        if (finished) return;
+        finished = true;
+        labelNode.contentEditable = "false";
+        labelNode.classList.remove("editing");
+        if (save) {
+          const next = labelNode.textContent.trim().slice(0, 40);
+          item.name = next;
+        }
+        render();
+      };
+
+      labelNode.addEventListener("blur", () => commit(true), { once: true });
+      labelNode.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          labelNode.blur();
+        } else if (event.key === "Escape") {
+          event.preventDefault();
+          labelNode.textContent = original;
+          commit(false);
+        }
+      });
+    }
+
+    function render() {
+      room.querySelectorAll(".item").forEach((node) => node.remove());
+
+      state.items.forEach((item) => {
+        const size = footprint(item);
+        const node = document.createElement("div");
+        node.className = `item ${item.type}`;
+        node.style.left = `${item.x}px`;
+        node.style.top = `${item.y}px`;
+        node.style.width = `${size.width}px`;
+        node.style.height = `${size.height}px`;
+        node.dataset.id = String(item.id);
+        const labelText = item.name && item.name.trim()
+          ? item.name
+          : `${TYPE_LABELS[item.type]} ${item.id}`;
+        const labelNode = document.createElement("span");
+        labelNode.className = "label";
+        labelNode.textContent = labelText;
+        labelNode.addEventListener("pointerdown", (event) => {
+          event.stopPropagation();
+        });
+        labelNode.addEventListener("click", (event) => {
+          event.stopPropagation();
+          state.selectedId = item.id;
+          syncSelection();
+          startInlineNameEdit(labelNode, item);
+        });
+        node.appendChild(labelNode);
+        node.addEventListener("pointerdown", startDrag);
+        room.appendChild(node);
+      });
+
+      syncSelection();
+      autoSave();
+    }
+
+    function pointerToRoom(event) {
+      const rect = room.getBoundingClientRect();
+      return {
+        x: (event.clientX - rect.left) / state.zoom,
+        y: (event.clientY - rect.top) / state.zoom
+      };
+    }
+
+    function startDrag(event) {
+      const id = Number(event.currentTarget.dataset.id);
+      const item = state.items.find((placed) => placed.id === id);
+      if (!item) return;
+
+      const point = pointerToRoom(event);
+      state.drag = {
+        id,
+        offsetX: point.x - item.x,
+        offsetY: point.y - item.y
+      };
+      state.selectedId = id;
+      syncSelection();
+      event.currentTarget.classList.add("dragging");
+      event.currentTarget.setPointerCapture(event.pointerId);
+    }
+
+    function dragItem(event) {
+      if (!state.drag) return;
+      const item = state.items.find((placed) => placed.id === state.drag.id);
+      if (!item) return;
+
+      const point = pointerToRoom(event);
+      item.x = point.x - state.drag.offsetX;
+      item.y = point.y - state.drag.offsetY;
+      clampItem(item);
+
+      const node = room.querySelector(`.item[data-id="${item.id}"]`);
+      if (node) {
+        node.style.left = `${item.x}px`;
+        node.style.top = `${item.y}px`;
+      }
+      syncSelection();
+    }
+
+    function endDrag() {
+      if (!state.drag) return;
+      const node = room.querySelector(`.item[data-id="${state.drag.id}"]`);
+      if (node) node.classList.remove("dragging");
+      state.drag = null;
+      syncSelection();
+    }
+
+    addDeskButton.addEventListener("click", () => addItem("desk"));
+    addColumnButton.addEventListener("click", () => addItem("column"));
+    addDoorButton.addEventListener("click", () => addItem("door"));
+    rotateItemButton.addEventListener("click", rotateSelected);
+    duplicateItemButton.addEventListener("click", duplicateSelected);
+    deleteItemButton.addEventListener("click", deleteSelected);
+
+    roomWidthInput.addEventListener("change", applyRoomSize);
+    roomHeightInput.addEventListener("change", applyRoomSize);
+    applyRoomSizeButton.addEventListener("click", applyRoomSize);
+    deskWidthInput.addEventListener("change", syncDefaultSizes);
+    deskHeightInput.addEventListener("change", syncDefaultSizes);
+    columnWidthInput.addEventListener("change", syncDefaultSizes);
+    columnHeightInput.addEventListener("change", syncDefaultSizes);
+    doorWidthInput.addEventListener("change", syncDefaultSizes);
+    doorHeightInput.addEventListener("change", syncDefaultSizes);
+    itemXInput.addEventListener("change", () => moveSelectedTo(Number(itemXInput.value), selectedItem()?.y));
+    itemYInput.addEventListener("change", () => moveSelectedTo(selectedItem()?.x, Number(itemYInput.value)));
+    itemWidthInput.addEventListener("change", resizeSelected);
+    itemHeightInput.addEventListener("change", resizeSelected);
+    zoomInput.addEventListener("input", () => setZoom(Number(zoomInput.value)));
+    exportFileButton.addEventListener("click", downloadLayoutFile);
+    importFileButton.addEventListener("click", triggerImportFile);
+    importFileInput.addEventListener("change", handleImportFile);
+
+    function openHelp() { helpModal.classList.add("open"); }
+    function closeHelp() { helpModal.classList.remove("open"); }
+    helpButton.addEventListener("click", openHelp);
+    helpClose.addEventListener("click", closeHelp);
+    helpModal.addEventListener("click", (event) => {
+      if (event.target === helpModal) closeHelp();
+    });
+    window.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && helpModal.classList.contains("open")) closeHelp();
+    });
+
+    room.addEventListener("pointermove", dragItem);
+    room.addEventListener("pointerup", endDrag);
+    room.addEventListener("pointercancel", endDrag);
+    room.addEventListener("pointerleave", (event) => {
+      if (event.buttons === 0) endDrag();
+    });
+    room.addEventListener("pointerdown", (event) => {
+      if (event.target === room) {
+        state.selectedId = null;
+        syncSelection();
+      }
+    });
+
+    window.addEventListener("keydown", (event) => {
+      if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) return;
+      if (event.target instanceof HTMLElement && event.target.isContentEditable) return;
+      if (event.key === "Delete") {
+        deleteSelected();
+      }
+      if (event.key.toLowerCase() === "r") {
+        rotateSelected();
+      }
+    });
+
+    syncDefaultSizes();
+    setZoom(Number(zoomInput.value));
+
+    (function initialLoad() {
+      autoSaveSuspended = true;
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          applyLayoutData(JSON.parse(saved));
+          setStorageStatus("저장된 배치를 자동으로 불러왔습니다.");
+        } else {
+          applyLayoutData(DEFAULT_LAYOUT);
+          setStorageStatus("기본 배치를 불러왔습니다.");
+        }
+      } catch (error) {
+        applyLayoutData(DEFAULT_LAYOUT);
+        setStorageStatus(`자동 불러오기 실패, 기본 배치 사용: ${error.message}`);
+      }
+      autoSaveSuspended = false;
+      autoSave();
+    })();
+  </script>
+</body>
+</html>
